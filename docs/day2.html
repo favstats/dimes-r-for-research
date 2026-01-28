@@ -3,7 +3,7 @@
   <head>
     <title>dashboardr Workshop - Day 2</title>
     <meta charset="utf-8" />
-    <meta name="author" content="     Fabio Votta      favstats      www.favstats.eu      develop-rpkgs.netlify.app    2025-01-30" />
+    <meta name="author" content="     Fabio Votta      favstats      www.favstats.eu      favstats.github.io/dimes-r-for-research/day2    2025-01-30" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <script src="libs/clipboard/clipboard.min.js"></script>
     <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
@@ -23,7 +23,7 @@ class: center, middle, inverse, title-slide
 ## Building Beautiful Interactive Dashboards in R
 ]
 .author[
-### <br><br><br><br> Fabio Votta <br><br> <a href="http://github.com/favstats"> <i class="fa fa-github fa-fw"></i> favstats </a> <br> <a href="http://www.favstats.eu/"> <i class="fa fa-address-card"></i> www.favstats.eu </a> <br> <a href="https://develop-rpkgs.netlify.app/"> <i class="fa fa-paper-plane fa-fw"></i> develop-rpkgs.netlify.app </a> <br><br>2025-01-30
+### <br><br><br><br> Fabio Votta <br><br> <a href="http://github.com/favstats"> <i class="fa fa-github fa-fw"></i> favstats </a> <br> <a href="http://www.favstats.eu/"> <i class="fa fa-address-card"></i> www.favstats.eu </a> <br> <a href="https://favstats.github.io/dimes-r-for-research/day2"> <i class="fa fa-paper-plane fa-fw"></i> favstats.github.io/dimes-r-for-research/day2 </a> <br><br>2025-01-30
 ]
 
 ---
@@ -431,26 +431,39 @@ AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
 # The IDEA &amp; SPECS
 
+.pull-left[
+### Core Philosophy
 
-+ Pipeable, tidyverse style
+**Pipeable, tidyverse style** `%&gt;%`
 
+&lt;br&gt;
 
-- STATIC HTML with Quarto (“Successor” to Rmarkdown)
-  + Why not Shiny?
-  + Requires hosting + computational power costs 
-  + Can be slow at times
+### Static HTML with Quarto
 
---
-
-- Easy + Accessible TEMPLATE
-  + NO knowledge required of HTML, CSS, JavaScript
-  + Ready-made functions for interactive data visualizations
-  + Straightforward coloring and theming for your aesthetic needs
+- No server needed (unlike Shiny!)
+- No hosting costs
+- Always fast &amp; available
+]
 
 --
 
-&gt; —&gt; ambitious goal of a grammar of dashboards
+.pull-right[
+&lt;img src="https://rstudio.github.io/cheatsheets/html/images/logo-quarto.png" style="width: 180px; float: right; margin-left: 20px;"&gt;
 
+### Easy &amp; Accessible
+
+- **NO** HTML/CSS/JS knowledge needed
+- **Ready-made** interactive visualizations
+- **Simple** theming &amp; customization
+]
+
+--
+
+.center[
+.key-point[
+**The ambitious goal:** A *grammar of dashboards*... like ggplot2 for plots!
+]
+]
 
 ---
 
@@ -472,10 +485,10 @@ AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
 ``` r
 # Install pak (package manager)
-install.packages("pak")
+install.packages("devtools")
 
 # Install dashboardr from GitHub
-pak::pak("favstats/dashboardr")
+devtools::install_github("favstats/dashboardr")
 ```
 
 --
@@ -497,8 +510,7 @@ library(dplyr)
 
 class: inverse, center, middle
 
-# Core Concepts
-## The Three-Layer Architecture
+# Core Concepts: 3 Layers
 
 ![](https://media.giphy.com/media/3o7btNa0RUYa5E7iiQ/giphy.gif)
 
@@ -506,11 +518,6 @@ class: inverse, center, middle
 
 # How dashboardr Works
 
-Just like **ggplot2** builds plots from layers (data, aesthetics, geoms), **dashboardr** builds dashboards from **three layers**:
-
---
-
-&lt;br&gt;
 
 .center[
 ![](https://favstats.github.io/dashboardr/articles/workflow_example.png)
@@ -520,13 +527,14 @@ Just like **ggplot2** builds plots from layers (data, aesthetics, geoms), **dash
 
 # The Three Layers
 
-.ninety[
+&lt;br&gt;
+
 | Layer | Purpose | Key Functions |
 |-------|---------|---------------|
 | **Content** | What to show | `create_content()`, `add_viz()`, `add_text()` |
 | **Page** | Where content lives | `create_page()`, `add_content()` |
 | **Dashboard** | Final output + config | `create_dashboard()`, `add_pages()` |
-]
+
 
 --
 
@@ -547,51 +555,71 @@ content %&gt;% page %&gt;% dashboard
 class: inverse, center, middle
 
 # Layer 1: Content
-## Building Visualizations
 
-![](https://media.giphy.com/media/3oKIPEqDGUULpEU0aQ/giphy.gif)
+## Building Visualizations and More
+
+![](https://i.gifer.com/3ut0.gif)
 
 ---
 
 # What is Content?
 
-**Content collections** hold your visualizations, text, and more.
-
-Think of it as a **container** for everything you want to display.
+**Content collections** hold your visualizations, text, and much more. A container for everything you want to display.
 
 --
 
-.pull-left[
 ### You can add:
 
-- 📊 Visualizations (`add_viz()`)
-- 📝 Text blocks (`add_text()`)
-- 📢 Callouts (`add_callout()`)
-- 🔢 Value boxes (`add_valuebox()`)
-]
-
-.pull-right[
-### Think of it like:
-
-A **shopping basket** that you fill with charts and text before putting it on a page!
-]
+| Function | Adds |
+|----------|------|
+| `add_viz()` | Charts &amp; visualizations |
+| `add_text()` | Text blocks (markdown supported) |
+| `add_callout()` | Highlighted callout boxes |
+| `add_valuebox()` | Key metrics &amp; numbers |
 
 ---
 
 # Creating Content: Overview
 
-Let's create a simple content collection:
+Let's create a simple content collection, and the most common one you will want to have, a visualization
+
+We start with `create_content`, our collection for content or as we refer to it here a `content collection`.
 
 
 ``` r
-demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education Level")
+create_content()
 ```
 
-This does two things:
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+⚠ Empty collection
+```
 
-1. Creates a **container** with data and default chart type
-2. Adds a **bar chart** showing education levels
+Right now it is empty.
+
+---
+
+
+# Creating Content: Overview
+
+Now we are adding some data and visualizations to our container!
+
+
+``` r
+create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = degree, title = "Education Level")
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+1 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education Level (bar) x=degree
+```
+
+This finally creates our first content collection **with** content.
+
+But what happens here?
 
 ---
 
@@ -602,14 +630,22 @@ This does two things:
 
 
 ``` r
-*demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
+*create_content(data = gss, type = "bar") %&gt;%
   add_viz(x_var = "degree", title = "Education Level")
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+1 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education Level (bar) x=degree
 ```
 
 `create_content()` sets up a container:
 
-- `data = gss` — the dataset to visualize
-- `type = "bar"` — default chart type for this collection
+- `data = gss`: the dataset to visualize
+
+- `type = "bar"`: default chart type for this collection
 
 ---
 
@@ -617,24 +653,34 @@ This does two things:
 
 
 ``` r
-demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
+create_content(data = gss, type = "bar") %&gt;%
 *  add_viz(x_var = "degree", title = "Education Level")
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+1 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education Level (bar) x=degree
 ```
 
 `add_viz()` adds a visualization:
 
-- `x_var = "degree"` — which variable to plot
-- `title = "Education Level"` — chart title
+- `x_var = "degree"`: which variable to plot
+
+- `title = "Education Level"`: chart title
 
 ---
 
 # Inspecting Your Content
 
-Use `print()` to see what's inside your content collection:
+Use `print()` to see what's inside your content collection or just run the content collection:
 
 
 ``` r
-print(demographics)
+create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "degree", title = "Education Level") %&gt;% 
+  print()
 ```
 
 ```
@@ -664,12 +710,53 @@ demographics %&gt;% preview()
 
 
 
-&lt;iframe src="viz/Untitled.html" width="100%" height="350px" style="border:none;" 
-  onload="this.contentDocument.head.insertAdjacentHTML('beforeend', 
-    '&lt;style&gt;.highchart{height:150px !important}&lt;/style&gt;'); 
+
+&lt;iframe src="viz/0.html" width="100%" height="350px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
     setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
 &lt;/iframe&gt;
-  
+
+---
+
+
+### Limitations of Preview
+
+&gt; **Important:** `preview()` is a simplified rendering for quick checks during development. It does **not** show the final dashboard appearance.
+
+--
+
+&lt;br&gt;
+
+.pull-left[
+
+**What preview shows well:**
+
+- Individual visualizations and their data
+- Basic tabgroup organization
+- Content blocks (text, callouts, cards, etc.)
+- Simple nested tabs
+
+]
+
+.pull-right[
+**What preview does NOT support:**
+
+- Full dashboard navigation and layout
+- Interactive inputs (dropdowns, sliders, checkboxes)
+- Complex multi-page structures
+- Dashboard theming and styling
+- Sidebar navigation
+- Mobile responsiveness
+]
+
+
+
+&lt;br&gt;
+&lt;br&gt;
+
+**For a real view of your dashboard**, you must run `generate_dashboard()` and open the resulting Quarto site:
+
 ---
 
 # Adding Multiple Visualizations
@@ -677,11 +764,15 @@ demographics %&gt;% preview()
 You can keep adding to content collections:
 
 
+
+
 ``` r
 demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education Level") %&gt;%
-  add_viz(x_var = "race", title = "By Race")
+*add_viz(x_var = degree, title = "Education Level") %&gt;%
+*add_viz(x_var = race, title = "By Race")
 ```
+
+--
 
 
 ``` r
@@ -689,23 +780,33 @@ print(demographics)
 ```
 
 
---
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education Level (bar) x=degree
+• [Viz] By Race (bar) x=race
+```
+
 
 &lt;br&gt;
 
-Now your collection has **two** bar charts!
+Now your collection has **two** bar charts underneath each other!
 
 ---
 
-# Organizing with Tabgroups
+# Organizing with Tabgroups - using `tabgroup()`
 
 Use `tabgroup` to organize charts into **tabs**:
 
 
+
+
+
 ``` r
 demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %&gt;%
-  add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes")
+  add_viz(x_var = "degree", title = "Education", `tabgroup = "Demographics"`) %&gt;%
+  add_viz(x_var = "happy", title = "Happiness", `tabgroup = "Attitudes"`)
 ```
 
 --
@@ -715,7 +816,16 @@ demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
 print(demographics)
 ```
 
-&lt;br&gt;
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+❯ [Tab] Demographics (1 viz)
+  • [Viz] Education (bar) x=degree
+❯ [Tab] Attitudes (1 viz)
+  • [Viz] Happiness (bar) x=happy
+```
+
 
 This creates:
 
@@ -724,61 +834,118 @@ This creates:
 
 ---
 
-# Tabgroups: Step by Step
+# Tabgroups: Step by Step - using `tabgroup()`
+
 
 
 ``` r
 demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-*  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %&gt;%
+  add_viz(x_var = "degree", title = "Education", `tabgroup = "Demographics"`) %&gt;%
   add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes")
+```
+
+
+
+``` r
+print(demographics)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+❯ [Tab] Demographics (1 viz)
+  • [Viz] Education (bar) x=degree
+❯ [Tab] Attitudes (1 viz)
+  • [Viz] Happiness (bar) x=happy
 ```
 
 First visualization goes into the **"Demographics"** tab.
 
 ---
 
-# Tabgroups: Step by Step
+# Tabgroups: Step by Step - using `tabgroup()`
+
 
 
 ``` r
 demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
   add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %&gt;%
-*  add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes")
+  add_viz(x_var = "happy", title = "Happiness", `tabgroup = "Attitudes"`)
+```
+
+
+``` r
+print(demographics)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+❯ [Tab] Demographics (1 viz)
+  • [Viz] Education (bar) x=degree
+❯ [Tab] Attitudes (1 viz)
+  • [Viz] Happiness (bar) x=happy
 ```
 
 Second visualization goes into the **"Attitudes"** tab.
 
 ---
 
+# Tabgroups: Preview
+
+
+
+``` r
+demographics %&gt;% preview()
+```
+
+&lt;iframe src="viz/1.html" width="100%" height="350px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+---
+
 # Different Chart Types
 
-Change `type` in `create_content()` or override per visualization:
+You can also **override** arguments set by `create_content`. Change `type` in `create_content()` and override per visualization:
 
 .eighty[
 
 ``` r
-mixed_content &lt;- create_content(data = gss, type = "bar") %&gt;%
+mixed_charts &lt;- create_content(data = gss, `type = "bar"`) %&gt;%
   add_viz(x_var = "degree", title = "Education") %&gt;%                 # bar (default)
-  add_viz(x_var = "age", title = "Age Distribution", type = "histogram") %&gt;%  # override!
-  add_viz(x_var = "happy", title = "Happiness", type = "pie")        # override!
+  add_viz(x_var = "age", title = "Age Distribution", `type = "histogram"`) %&gt;%  # override!
+  add_viz(x_var = "happy", title = "Happiness", `type = "bar"`)        # override back to bar!
 ```
 ]
+
+
+``` r
+print(mixed_charts)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+3 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education (bar) x=degree
+• [Viz] Age Distribution (histogram) x=age
+• [Viz] Happiness (bar) x=happy
+```
 
 --
 
 &lt;br&gt;
 
-Available types: `bar`, `histogram`, `pie`, `stackedbar`, `timeline`, `heatmap`, `scatter`, `crosstab`, `treemap`
+Available types: `bar`, `histogram`, `stackedbar`, `timeline`, `heatmap`, `scatter`, `crosstab`, `treemap`, and MORE!
 
 ---
 
-# Live Demo: Multiple Chart Types
-
-
-
----
-
-# Adding Text to Content
+# Adding Text to Content - `add_text()`
 
 Content isn't just charts! Add text with `add_text()`:
 
@@ -794,13 +961,140 @@ intro_content &lt;- create_content() %&gt;%
   )
 ```
 
+
+``` r
+print(intro_content)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+1 items | ✖ no data
+
+ℹ [Text]
+```
+
 Each argument is a line of **Markdown** — use `""` for blank lines!
+
+---
+
+# Markdown Power in `add_text()`
+
+.pull-left[
+### What you write:
+
+```r
+add_text(
+
+  "## Section Title",
+  "Regular paragraph text.",
+*  "**Bold** and *italic* work!",
+*  "- Bullet points",
+*  "- Are supported",
+  "",
+*  "[Links](https://example.com) too!"
+)
+```
+]
+
+.pull-right[
+### What you get:
+
+## Section Title
+
+Regular paragraph text.
+
+**Bold** and *italic* work!
+
+- Bullet points
+- Are supported
+
+[Links](https://example.com) too!
+]
+
+--
+
+.center[
+.tip[
+No HTML knowledge needed: just write Markdown and `dashboardr` renders it beautifully!
+]
+]
+
+---
+
+
+# Adding Text to Content - `add_text()`
+
+Content isn't just charts! Add text with `add_text()`:
+
+
+
+``` r
+preview(intro_content)
+```
+
+&lt;iframe src="viz/3.html" width="100%" height="350px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+---
+
+# Mixing Text with Visualizations
+
+The real power: **combine text and charts** in one collection!
+
+
+
+
+``` r
+report &lt;- create_content(data = gss, type = "bar") %&gt;%
+*add_text(
+*  "## Survey Overview",
+*  "This section presents key demographic breakdowns from the GSS."
+*) %&gt;%
+  add_viz(x_var = "degree", title = "Education Level") %&gt;%
+*add_text(
+*  "**Note:** Education categories follow US Census definitions."
+*) %&gt;%
+  add_viz(x_var = "race", title = "Racial Demographics")
+```
+
+--
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+4 items | ✔ data: 3139 rows x 7 cols
+
+ℹ [Text]
+• [Viz] Education Level (bar) x=degree
+ℹ [Text]
+• [Viz] Racial Demographics (bar) x=race
+```
+
+Text and visualizations appear **in the order you add them**!
+
+---
+
+# Mixing Text with Visualizations: Preview
+
+
+``` r
+report %&gt;% preview()
+```
+
+&lt;iframe src="viz/4.html" width="100%" height="400px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+Text blocks render as **formatted Markdown** between your charts!
 
 ---
 
 # Content Layer Summary
 
-.pull-left[
 | Function | Purpose |
 |----------|---------|
 | `create_content(data, type)` | Start a new content collection |
@@ -808,15 +1102,11 @@ Each argument is a line of **Markdown** — use `""` for blank lines!
 | `add_text(...)` | Add markdown text |
 | `print()` | Inspect structure |
 | `preview()` | Quick visual check |
-]
 
-.pull-right[
-&lt;br&gt;
 
 **Key insight:** 
 
-Content is *reusable* — you can attach the same content to multiple pages!
-]
+Content is *reusable*: you can attach the same content to multiple pages!
 
 ---
 
@@ -843,28 +1133,22 @@ class: inverse, center, middle
 
 Create a content collection with the GSS data:
 
-.pull-left[
 **Step 1:** Create content with bar charts for `degree` and `race`
 
-
-``` r
-my_content &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "___", title = "___") %&gt;%
-  add_viz(x_var = "___", title = "___")
-```
-
 **Step 2:** Organize them into tabgroups
-]
 
-.pull-right[
 **Step 3:** Add a bar chart for `happy` (happiness)
 
 **Step 4:** Use `print()` and `preview()` to check your work!
 
-&lt;br&gt;
+**ALTERNATIVELY:** user your own data in a similar way!
 
-⏱️ **Time:** ~15 minutes
-]
+You can always consult the documentation as well: 
+
+[Click Here](https://favstats.github.io/dashboardr/articles/content-collections.html) for content collection deep dive.
+
+
+⏱️ **Time:** ~30 minutes
 
 ---
 
@@ -1621,6 +1905,7 @@ class: inverse, center, middle
 <script>var slideshow = remark.create({
   "highlightStyle": "github",
   "highlightLines": true,
+  "highlightSpans": true,
   "countIncrementalSlides": false,
   "slideNumberFormat": "%current%<br>",
   "ratio": "16:9"
