@@ -1,35 +1,42 @@
-<!DOCTYPE html>
-<html lang="" xml:lang="">
-  <head>
-    <title>dashboardr Workshop (Day 2)</title>
-    <meta charset="utf-8" />
-    <meta name="author" content="     Fabio Votta      favstats      www.favstats.eu      favstats.github.io/dimes-r-for-research/day2    2025-01-30" />
-    <script src="libs/header-attrs/header-attrs.js"></script>
-    <script src="libs/clipboard/clipboard.min.js"></script>
-    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
-    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
-    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
-    <script src="https://use.fontawesome.com/5235085b15.js"></script>
-    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
-  </head>
-  <body>
-    <textarea id="source">
-class: center, middle, inverse, title-slide
+---
+title: "dashboardr Workshop (Day 2)"
+subtitle: "Building Beautiful Interactive Dashboards in R"
+author: '<br><br><br><br>
+Fabio Votta <br><br>
+<a href="http://github.com/favstats">
+  <i class="fa fa-github fa-fw"></i>&nbsp;favstats
+</a> <br>
+<a href="http://www.favstats.eu/">
+  <i class="fa fa-address-card"></i>&nbsp;www.favstats.eu
+</a> <br>
+<a href="https://favstats.github.io/dimes-r-for-research/day2">
+  <i class="fa fa-paper-plane fa-fw"></i>&nbsp;favstats.github.io/dimes-r-for-research/day2
+</a>
+<br><br>2025-01-30'
 
-.title[
-# dashboardr Workshop (Day 2)
-]
-.subtitle[
-## Building Beautiful Interactive Dashboards in R
-]
-.author[
-### <br><br><br><br> Fabio Votta <br><br> <a href="http://github.com/favstats"> <i class="fa fa-github fa-fw"></i> favstats </a> <br> <a href="http://www.favstats.eu/"> <i class="fa fa-address-card"></i> www.favstats.eu </a> <br> <a href="https://favstats.github.io/dimes-r-for-research/day2"> <i class="fa fa-paper-plane fa-fw"></i> favstats.github.io/dimes-r-for-research/day2 </a> <br><br>2025-01-30
-]
+output_dir: docs
 
+output: 
+  xaringan::moon_reader:
+    lib_dir: docs/libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%<br>"
+      ratio: "16:9"
+    includes:
+      in_header: header.html      
+    css: xaringan-themer.css
+knit: (function(input, ...) {
+    rmarkdown::render(input, output_dir = "docs");
+    if (!dir.exists("docs/images")) dir.create("docs/images", recursive = TRUE);
+    file.copy(list.files("images", full.names = TRUE), "docs/images/", overwrite = TRUE)
+  })
 ---
 
-
-&lt;style&gt;
+<style>
 /* Override title slide background for day 2 */
 .title-slide {
   background-image: url(https://favstats.github.io/dashboardr/reference/figures/logo.svg) !important;
@@ -167,19 +174,60 @@ class: center, middle, inverse, title-slide
 .tiny-code .remark-code {
   font-size: 60%;
 }
-&lt;/style&gt;
+</style>
 
 
 
+```{r, include = F}
+pacman::p_load(tidyverse, testthat, usethis, devtools)
 
+#Default Options - kann bei Gebrauch geändert werden
+knitr::opts_chunk$set(warning = F, message = F) # Whether to display errors
+xaringanExtra::use_clipboard()
 
+options(htmltools.dir.version = FALSE)
 
+# Enable widgetframe mode for interactive charts in xaringan slides
+options(dashboardr.use_widgetframe = TRUE)
+
+knitr::opts_chunk$set(
+  fig.width = 10,
+  fig.height = 5,
+  fig.retina = 2,
+  warning = FALSE,
+  message = FALSE,
+  echo = TRUE,
+  eval = FALSE,
+  comment = "#>"
+)
+```
+
+```{r load-data, include = F, eval = TRUE}
+# Load packages
+library(dashboardr)
+library(highcharter)
+library(dplyr)
+library(gssr)
+library(widgetframe)
+
+# Load GSS data and select relevant variables (latest wave only)
+# data(gss_all)
+# gss <- gss_all %>%
+#   # select(year, age, sex, race, degree, happy, polviews) %>%
+#   filter(year == max(year, na.rm = TRUE), !is.na(age), !is.na(sex), !is.na(race), !is.na(degree))
+# 
+# saveRDS(gss, file = "data/gss.rds")
+
+gss <- readRDS("data/gss.rds")
+```
 
 
 
 ## Welcome Back! 
 
-&lt;img src="https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif" alt="" width="60%" style="display: block; margin: auto;" /&gt;
+```{r, echo = FALSE, eval = TRUE, out.width = "60%", fig.align = "center"}
+knitr::include_graphics("https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif")
+```
 
 
 ---
@@ -189,7 +237,7 @@ class: center, middle, inverse, title-slide
 
 | Time | | Topic |
 |------|---|-------|
-| **10:15 - 11:00** | | Introduction &amp; The Grammar of Dashboards |
+| **10:15 - 11:00** | | Introduction & The Grammar of Dashboards |
 | **11:00 - 11:30** | | Layer 1: Content Collections |
 | | | |
 | **11:30 - 11:45** | | *Short Break* ☕ |
@@ -205,8 +253,8 @@ class: center, middle, inverse, title-slide
 | | | |
 | **14:00 - 14:30** | | Layer 3: Dashboards |
 | **14:30 - 15:00** | | **Exercise 3:** Build Complete Dashboard |
-| **15:00 - 15:30** | | Tips, Tricks &amp; Function Overview |
-| **15:30 - 16:00** | | Q&amp;A + Free Practice |
+| **15:00 - 15:30** | | Tips, Tricks & Function Overview |
+| **15:30 - 16:00** | | Q&A + Free Practice |
 
 ---
 
@@ -246,7 +294,7 @@ class: inverse, center, middle
 ### Bonus
 - Complete working example
 - Function reference
-- Tips &amp; best practices
+- Tips & best practices
 ]
 
 --
@@ -265,7 +313,7 @@ class: inverse, center, middle
 
 ---
 
-# Problem: Our data is not &lt;u&gt;accessible&lt;/u&gt; to the public
+# Problem: Our data is not <u>accessible</u> to the public
 
 --
 
@@ -281,7 +329,7 @@ class: inverse, center, middle
 
 ---
 
-# Problem: Our data is not &lt;u&gt;accessible&lt;/u&gt; to the public
+# Problem: Our data is not <u>accessible</u> to the public
 
 --
 
@@ -318,7 +366,7 @@ Need a solution that is:
 
 # And the answer is: DASHBOARDS
 
-&lt;br&gt;
+<br>
 
 ![](images/dashboards.png)
 
@@ -334,7 +382,7 @@ Need a solution that is:
 
 AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
-&lt;br&gt;
+<br>
 
 + For other researchers in the consortium without data wrangling expertise
 
@@ -378,7 +426,7 @@ AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
 + Easy to make with limited computational knowledge ❌
 
-&lt;br&gt;
+<br>
 
 *This is where dashboardr comes in!*
 ]
@@ -417,25 +465,25 @@ AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
 # And now you can do this YOURSELF thanks to…
 
-&lt;br&gt;
-&lt;br&gt;
+<br>
+<br>
 
-&lt;center&gt;
-&lt;div class="drum-roll"&gt;
-&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;
-&lt;/div&gt;
-&lt;/center&gt;
+<center>
+<div class="drum-roll">
+<span>🥁</span><span>🥁</span><span>🥁</span><span>🥁</span><span>🥁</span><span>🥁</span><span>🥁</span><span>🥁</span><span>🥁</span><span>🥁</span>
+</div>
+</center>
 
 
 ---
 
 # Introducing `dashboardr`
 
-&lt;center&gt;
-&lt;div class="silly-logo"&gt;
-&lt;img src="https://favstats.github.io/dashboardr/reference/figures/logo.svg"&gt;
-&lt;/div&gt;
-&lt;/center&gt;
+<center>
+<div class="silly-logo">
+<img src="https://favstats.github.io/dashboardr/reference/figures/logo.svg">
+</div>
+</center>
 
 ---
 
@@ -444,47 +492,47 @@ AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
 
 .pull-left[
-&lt;img src="images/dasher.png" style="width:70%;"&gt;
+<img src="images/dasher.png" style="width:70%;">
 ]
 
 .pull-right[
-&lt;img src="https://favstats.github.io/dashboardr/reference/figures/logo.svg" style="width:70%;"&gt;
+<img src="https://favstats.github.io/dashboardr/reference/figures/logo.svg" style="width:70%;">
 ]
 
 
 .pull-right[
-&gt; Logo courtesy of Vivien Fabry :)
+> Logo courtesy of Vivien Fabry :)
 ]
 
 
 ---
 
-# The IDEA &amp; SPECS
+# The IDEA & SPECS
 
 .pull-left[
 ### Core Philosophy
 
-**Pipeable, tidyverse style** `%&gt;%`
+**Pipeable, tidyverse style** `%>%`
 
-&lt;br&gt;
+<br>
 
 ### Static HTML with Quarto
 
 - No server needed (unlike Shiny!)
 - No hosting costs
-- Always fast &amp; available
+- Always fast & available
 ]
 
 --
 
 .pull-right[
-&lt;img src="https://rstudio.github.io/cheatsheets/html/images/logo-quarto.png" style="width: 180px; float: right; margin-left: 20px;"&gt;
+<img src="https://rstudio.github.io/cheatsheets/html/images/logo-quarto.png" style="width: 180px; float: right; margin-left: 20px;">
 
-### Easy &amp; Accessible
+### Easy & Accessible
 
 - **NO** HTML/CSS/JS knowledge needed
 - **Ready-made** interactive visualizations
-- **Simple** theming &amp; customization
+- **Simple** theming & customization
 ]
 
 --
@@ -512,8 +560,7 @@ AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
 # Installation
 
-
-``` r
+```{r, eval = F}
 # Install pak (package manager)
 install.packages("devtools")
 
@@ -523,8 +570,7 @@ devtools::install_github("favstats/dashboardr")
 
 --
 
-
-``` r
+```{r, eval = F}
 # Load packages
 library(dashboardr)
 ```
@@ -550,42 +596,41 @@ class: inverse, center, middle
 # Full Working Example
 
 .sixty[
-
-``` r
+```{r, eval = F}
 library(dashboardr)
 library(dplyr)
 library(gssr)
 
 # Load GSS data
 data(gss_all)
-gss &lt;- gss_all %&gt;%
-  select(year, age, sex, race, degree, happy, polviews) %&gt;%
+gss <- gss_all %>%
+  select(year, age, sex, race, degree, happy, polviews) %>%
   filter(year == max(year, na.rm = TRUE), !is.na(degree))
 
 # LAYER 1: Build content
-demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education", tabgroup = "Overview") %&gt;%
-  add_viz(x_var = "race", title = "Race", tabgroup = "Overview") %&gt;%
+demographics <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education", tabgroup = "Overview") %>%
+  add_viz(x_var = "race", title = "Race", tabgroup = "Overview") %>%
   add_viz(x_var = "sex", title = "Gender", tabgroup = "Overview")
 
 # LAYER 2: Create pages
-home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+home <- create_page("Home", is_landing_page = TRUE) %>%
   add_text("# GSS Explorer", "", "Explore the General Social Survey data.")
 
-analysis &lt;- create_page("Analysis", data = gss, icon = "ph:chart-bar") %&gt;%
+analysis <- create_page("Analysis", data = gss, icon = "ph:chart-bar") %>%
   add_content(demographics)
 
-about &lt;- create_page("About", navbar_align = "right", icon = "ph:info") %&gt;%
+about <- create_page("About", navbar_align = "right", icon = "ph:info") %>%
   add_text("## About", "", "Built with [dashboardr](https://github.com/favstats/dashboardr)")
 
 # LAYER 3: Assemble dashboard
-my_dashboard &lt;- create_dashboard(
+my_dashboard <- create_dashboard(
   title = "GSS Explorer", output_dir = "gss_dashboard", theme = "flatly"
-) %&gt;%
+) %>%
   add_pages(home, analysis, about)
 
 # Generate!
-my_dashboard %&gt;% generate_dashboard(render = TRUE, open = "browser")
+my_dashboard %>% generate_dashboard(render = TRUE, open = "browser")
 ```
 ]
 
@@ -609,7 +654,7 @@ Copy-paste that code, run it, and you'll have:
 
 --
 
-&lt;br&gt;
+<br>
 
 .center[
 ### All in about 30 lines of code! 🎉
@@ -636,7 +681,7 @@ class: inverse, center, middle
 
 # The Three Layers
 
-&lt;br&gt;
+<br>
 
 | Layer | Purpose | Key Functions |
 |-------|---------|---------------|
@@ -647,16 +692,15 @@ class: inverse, center, middle
 
 --
 
-&lt;br&gt;
+<br>
 
-Each layer flows into the next using pipes (`%&gt;%`), making your code **readable** and **modular**.
+Each layer flows into the next using pipes (`%>%`), making your code **readable** and **modular**.
 
 --
 
-
-``` r
+```{r, eval = F}
 # The typical pattern
-content %&gt;% page %&gt;% dashboard
+content %>% page %>% dashboard
 ```
 
 ---
@@ -697,8 +741,7 @@ and more! [See Here](https://favstats.github.io/dashboardr/articles/content-coll
 # Loading the Data - Paste this in the Beginning of your Script!
 
 .fivty[
-
-``` r
+```{r, eval = T}
 library(dashboardr)
 library(gssr)
 
@@ -706,16 +749,16 @@ library(gssr)
 data(gss_all)
 
 # Latest wave only (for most examples)
-gss &lt;- gss_all %&gt;%
+gss <- gss_all %>%
   select(year, age, sex, race, degree, happy, polviews, wtssps,
          educ, childs,  # Continuous variables for scatter plots
-         confinan, conbus, coneduc, confed, conmedic) %&gt;%  # Confidence in institutions
-  filter(year == max(year, na.rm = TRUE)) %&gt;%
+         confinan, conbus, coneduc, confed, conmedic) %>%  # Confidence in institutions
+  filter(year == max(year, na.rm = TRUE)) %>%
   filter(
     happy %in% 1:3,        # very happy, pretty happy, not too happy
     polviews %in% 1:7,     # extremely liberal to extremely conservative
     !is.na(age), !is.na(sex), !is.na(race), !is.na(degree)
-  ) %&gt;%
+  ) %>%
   mutate(
     happy = droplevels(as_factor(happy)),
     polviews = droplevels(as_factor(polviews)),
@@ -737,9 +780,9 @@ gss &lt;- gss_all %&gt;%
   )
 
 # Full time series (for timeline examples)
-gss_timeline &lt;- gss_all %&gt;%
-  select(year, happy) %&gt;%
-  filter(happy %in% 1:3, !is.na(year)) %&gt;%
+gss_timeline <- gss_all %>%
+  select(year, happy) %>%
+  filter(happy %in% 1:3, !is.na(year)) %>%
   mutate(happy = droplevels(as_factor(happy)))
 ```
 ]
@@ -752,8 +795,7 @@ Let's create a simple content collection, and the most common one you will want 
 
 We start with `create_content`, our collection for content or as we refer to it here a `content collection`.
 
-
-``` r
+```{r}
 create_content()
 ```
 
@@ -771,9 +813,8 @@ Right now it is empty.
 
 Now we are adding some data and visualizations to our container!
 
-
-``` r
-create_content(data = gss, type = "bar") %&gt;%
+```{r, eval = F}
+create_content(data = gss, type = "bar") %>%
   add_viz(x_var = degree, title = "Education Level")
 ```
 
@@ -792,12 +833,14 @@ But what happens here?
 
 # Creating Content: Step by Step
 
+```{r, echo=F, eval=T, include=F}
+demographics <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education Level")
+```
 
 
-
-
-``` r
-*create_content(data = gss, type = "bar") %&gt;%
+```{r, eval = F}
+{{create_content(data = gss, type = "bar") %>%}}
   add_viz(x_var = "degree", title = "Education Level")
 ```
 
@@ -818,10 +861,9 @@ But what happens here?
 
 # Creating Content: Step by Step
 
-
-``` r
-create_content(data = gss, type = "bar") %&gt;%
-*  add_viz(x_var = "degree", title = "Education Level")
+```{r, eval = F}
+create_content(data = gss, type = "bar") %>%
+{{  add_viz(x_var = "degree", title = "Education Level")}}
 ```
 
 ```
@@ -843,21 +885,13 @@ create_content(data = gss, type = "bar") %&gt;%
 
 Use `print()` to see what's inside your content collection or just run the content collection:
 
-
-``` r
-create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education Level") %&gt;% 
+```{r, eval = T}
+create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education Level") %>% 
   print()
 ```
 
-```
-#&gt; -- Content Collection ──────────────────────────────────────────────────────────
-#&gt; 1 items | ✔ data: 2997 rows x 15 cols
-#&gt; 
-#&gt; • [Viz] Education Level (bar) x=degree
-```
-
-&lt;br&gt;
+<br>
 
 This shows you exactly what you've built before generating anything!
 
@@ -867,33 +901,99 @@ This shows you exactly what you've built before generating anything!
 
 Use `preview()` to see the actual chart:
 
+```{r, eval = T, echo =F}
 
+sss <- demographics %>% preview(output = "widget")
 
+# <iframe src="viz/0.html" width="100%" height="500px" style="border:none;"></iframe>
+# htmlwidgets::saveWidget(
+#   sss,
+#   file = "viz/0.html"#,
+#   # selfcontained = TRUE
+# )
 
-``` r
-demographics %&gt;% preview()
+#' Save widget as self-contained HTML
+#' 
+#' @param widget A dashboardr widget created with preview(output = "widget")
+#' @param file Path to save the HTML file
+#' @param selfcontained Whether to embed all dependencies (default: TRUE)
+#' @return Invisibly returns the file path
+#' @export
+save_widget <- function(widget, file, selfcontained = TRUE) {
+  if (!inherits(widget, "dashboardr_widget")) {
+    stop("widget must be created with preview(output = 'widget')", call. = FALSE)
+  }
+  
+  file <- normalizePath(path.expand(file), mustWork = FALSE)
+  
+  # Ensure directory exists
+  dir.create(dirname(file), recursive = TRUE, showWarnings = FALSE)
+  
+  if (selfcontained) {
+    htmltools::save_html(widget, file = file)
+    message("Saved self-contained HTML to: ", file)
+  } else {
+    htmltools::save_html(widget, file = file, 
+                         libdir = paste0(tools::file_path_sans_ext(file), "_files"))
+    message("Saved HTML to: ", file)
+  }
+  
+  invisible(file)
+}
+
+# save_widget(sss, "docs/viz/0.html", selfcontained = T)
 ```
 
+```{r, eval = F}
+demographics %>% preview()
+```
 
+```{r preview-demo, eval = TRUE, echo = FALSE}
+# doc <- xml2::read_html("viz/0.html")
+# body <- rvest::html_element(doc, "body")
+# as.character(body) %>% shiny::HTML()
+# rvest::read_html("viz/0.html") %>% as.character() %>% shiny::HTML()
 
+# Create and preview the chart (using widgetframe for xaringan)
+# demo_content <- create_content(data = gss, type = "bar") %>%
+#   add_viz(x_var = "degree", title = "Education Level")
+#preview_slide(demo_content, height = "350px")
 
+embed_viz <- function(src, chart_height = 250, iframe_height = 350) {
+  htmltools::HTML(sprintf(
+    '<iframe src="%s" width="100%%" height="%dpx" scrolling="no" 
+      style="border:none; overflow:hidden;" 
+      onload="this.contentDocument.head.insertAdjacentHTML(\'beforeend\', 
+        \'<style>.highchart{height:%dpx !important} body{overflow:hidden; margin:0; padding:10px;}</style>\'); 
+        setTimeout(() => this.contentWindow.Highcharts?.charts.forEach(c => c?.reflow()), 500);">
+    </iframe>',
+    src, iframe_height, chart_height
+  ))
+}
 
-&lt;iframe src="viz/0.html" width="100%" height="350px" style="border:none;"
+```
+
+```{r, results='asis', echo=F}
+# embed_viz("viz/0.html", chart_height = 200, iframe_height = 200)
+# embed_viz("docs/viz/0.html", container_height = 300)
+```
+
+<iframe src="viz/0.html" width="100%" height="350px" style="border:none;"
   onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
-    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
-    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
-&lt;/iframe&gt;
+    '<style>.highchart{height:250px !important}</style>');
+    setTimeout(() => this.contentWindow.Highcharts?.charts.forEach(c => c?.reflow()), 500);">
+</iframe>
 
 ---
 
 
 ### Limitations of Preview
 
-&gt; **Important:** `preview()` is a simplified rendering for quick checks during development. It does **not** show the final dashboard appearance.
+> **Important:** `preview()` is a simplified rendering for quick checks during development. It does **not** show the final dashboard appearance.
 
 --
 
-&lt;br&gt;
+<br>
 
 .pull-left[
 
@@ -919,8 +1019,8 @@ demographics %&gt;% preview()
 
 
 
-&lt;br&gt;
-&lt;br&gt;
+<br>
+<br>
 
 **For a real view of your dashboard**, you must run `generate_dashboard()` and open the resulting Quarto site:
 
@@ -930,19 +1030,21 @@ demographics %&gt;% preview()
 
 You can keep adding to content collections:
 
+```{r, eval = T, echo = F}
+demographics <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = degree, title = "Education Level") %>%
+  add_viz(x_var = race, title = "By Race")
+```
 
-
-
-``` r
-demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-*add_viz(x_var = degree, title = "Education Level") %&gt;%
-*add_viz(x_var = race, title = "By Race")
+```{r, eval = F}
+demographics <- create_content(data = gss, type = "bar") %>%
+{{add_viz(x_var = degree, title = "Education Level") %>%}}
+{{add_viz(x_var = race, title = "By Race")}}
 ```
 
 --
 
-
-``` r
+```{r}
 print(demographics)
 ```
 
@@ -956,7 +1058,7 @@ print(demographics)
 ```
 
 
-&lt;br&gt;
+<br>
 
 Now your collection has **two** bar charts underneath each other!
 
@@ -966,21 +1068,24 @@ Now your collection has **two** bar charts underneath each other!
 
 Use `tabgroup` to organize charts into **tabs**:
 
+```{r, eval = T, echo = F}
+demographics <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %>%
+  add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes")
+```
 
 
-
-
-``` r
-demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education", `tabgroup = "Demographics"`) %&gt;%
+```{r, eval = F}
+demographics <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education", `tabgroup = "Demographics"`) %>%
   add_viz(x_var = "happy", title = "Happiness", `tabgroup = "Attitudes"`)
 ```
 
 --
 
-
-``` r
+```{r}
 print(demographics)
+
 ```
 
 ```
@@ -1004,17 +1109,16 @@ This creates:
 # Tabgroups: Step by Step - using `tabgroup()`
 
 
-
-``` r
-demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education", `tabgroup = "Demographics"`) %&gt;%
+```{r, eval = F}
+demographics <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education", `tabgroup = "Demographics"`) %>%
   add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes")
 ```
 
 
-
-``` r
+```{r}
 print(demographics)
+
 ```
 
 ```
@@ -1034,16 +1138,15 @@ First visualization goes into the **"Demographics"** tab.
 # Tabgroups: Step by Step - using `tabgroup()`
 
 
-
-``` r
-demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %&gt;%
+```{r, eval = F}
+demographics <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %>%
   add_viz(x_var = "happy", title = "Happiness", `tabgroup = "Attitudes"`)
 ```
 
-
-``` r
+```{r}
 print(demographics)
+
 ```
 
 ```
@@ -1063,16 +1166,15 @@ Second visualization goes into the **"Attitudes"** tab.
 # Tabgroups: Preview
 
 
-
-``` r
-demographics %&gt;% preview()
+```{r, eval = F}
+demographics %>% preview()
 ```
 
-&lt;iframe src="viz/1.html" width="100%" height="350px" style="border:none;"
+<iframe src="viz/1.html" width="100%" height="350px" style="border:none;"
   onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
-    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
-    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
-&lt;/iframe&gt;
+    '<style>.highchart{height:250px !important}</style>');
+    setTimeout(() => this.contentWindow.Highcharts?.charts.forEach(c => c?.reflow()), 500);">
+</iframe>
 
 ---
 
@@ -1081,19 +1183,22 @@ demographics %&gt;% preview()
 You can also **override** arguments set by `create_content`. Change `type` in `create_content()` and override per visualization:
 
 .eighty[
+```{r, eval = T, include=F, echo=F}
+mixed_charts <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education") %>%                 # bar (default)
+  add_viz(x_var = "age", title = "Age Distribution", type = "histogram") %>%  # override!
+  add_viz(x_var = "happy", title = "Happiness", type = "bar")        # override back to bar!
+```
 
-
-
-``` r
-mixed_charts &lt;- create_content(data = gss, `type = "bar"`) %&gt;%
-  add_viz(x_var = "degree", title = "Education") %&gt;%                 # bar (default)
-  add_viz(x_var = "age", title = "Age Distribution", `type = "histogram"`) %&gt;%  # override!
+```{r, eval = F}
+mixed_charts <- create_content(data = gss, `type = "bar"`) %>%
+  add_viz(x_var = "degree", title = "Education") %>%                 # bar (default)
+  add_viz(x_var = "age", title = "Age Distribution", `type = "histogram"`) %>%  # override!
   add_viz(x_var = "happy", title = "Happiness", `type = "bar"`)        # override back to bar!
 ```
 ]
 
-
-``` r
+```{r}
 print(mixed_charts)
 ```
 
@@ -1108,7 +1213,7 @@ print(mixed_charts)
 
 --
 
-&lt;br&gt;
+<br>
 
 Available types: `bar`, `histogram`, `stackedbar`, `timeline`, `heatmap`, `scatter`, `crosstab`, `treemap`, and MORE!
 
@@ -1118,9 +1223,8 @@ Available types: `bar`, `histogram`, `stackedbar`, `timeline`, `heatmap`, `scatt
 
 Content isn't just charts! Add text with `add_text()`:
 
-
-``` r
-intro_content &lt;- create_content() %&gt;%
+```{r, eval = T}
+intro_content <- create_content() %>%
   add_text(
     "## Welcome to the GSS Explorer",
     "",
@@ -1130,8 +1234,7 @@ intro_content &lt;- create_content() %&gt;%
   )
 ```
 
-
-``` r
+```{r}
 print(intro_content)
 ```
 
@@ -1196,16 +1299,15 @@ No HTML knowledge needed: just write Markdown and `dashboardr` renders it beauti
 Content isn't just charts! Add text with `add_text()`:
 
 
-
-``` r
+```{r}
 preview(intro_content)
 ```
 
-&lt;iframe src="viz/3.html" width="100%" height="350px" style="border:none;"
+<iframe src="viz/3.html" width="100%" height="350px" style="border:none;"
   onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
-    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
-    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
-&lt;/iframe&gt;
+    '<style>.highchart{height:250px !important}</style>');
+    setTimeout(() => this.contentWindow.Highcharts?.charts.forEach(c => c?.reflow()), 500);">
+</iframe>
 
 ---
 
@@ -1213,19 +1315,29 @@ preview(intro_content)
 
 The real power: **combine text and charts** in one collection!
 
+```{r mix-text-viz-run, eval = T, include = F}
+report <- create_content(data = gss, type = "bar") %>%
+  add_text(
+    "## Survey Overview",
+    "This section presents key demographic breakdowns from the GSS."
+  ) %>%
+  add_viz(x_var = "degree", title = "Education Level") %>%
+  add_text(
+    "**Note:** Education categories follow US Census definitions."
+  ) %>%
+  add_viz(x_var = "race", title = "Racial Demographics")
+```
 
-
-
-``` r
-report &lt;- create_content(data = gss, type = "bar") %&gt;%
-*add_text(
-*  "## Survey Overview",
-*  "This section presents key demographic breakdowns from the GSS."
-*) %&gt;%
-  add_viz(x_var = "degree", title = "Education Level") %&gt;%
-*add_text(
-*  "**Note:** Education categories follow US Census definitions."
-*) %&gt;%
+```{r, eval = F}
+report <- create_content(data = gss, type = "bar") %>%
+{{add_text(}}
+{{  "## Survey Overview",}}
+{{  "This section presents key demographic breakdowns from the GSS."}}
+{{) %>%}}
+  add_viz(x_var = "degree", title = "Education Level") %>%
+{{add_text(}}
+{{  "**Note:** Education categories follow US Census definitions."}}
+{{) %>%}}
   add_viz(x_var = "race", title = "Racial Demographics")
 ```
 
@@ -1247,16 +1359,15 @@ Text and visualizations appear **in the order you add them**!
 
 # Mixing Text with Visualizations: Preview
 
-
-``` r
-report %&gt;% preview()
+```{r, eval = F}
+report %>% preview()
 ```
 
-&lt;iframe src="viz/4.html" width="100%" height="400px" style="border:none;"
+<iframe src="viz/4.html" width="100%" height="400px" style="border:none;"
   onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
-    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
-    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
-&lt;/iframe&gt;
+    '<style>.highchart{height:250px !important}</style>');
+    setTimeout(() => this.contentWindow.Highcharts?.charts.forEach(c => c?.reflow()), 500);">
+</iframe>
 
 Text blocks render as **formatted Markdown** between your charts!
 
@@ -1266,16 +1377,25 @@ Text blocks render as **formatted Markdown** between your charts!
 
 Perfect for **survey questions with ordered responses** (e.g., confidence, agreement):
 
-
+```{r, include=F, echo = F}
+confidence <- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %>%
+  add_viz(
+    x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic"),
+    x_var_labels = c("Banks & financial institutions", "Major companies",
+                     "Education", "Federal government", "Medicine"),
+    title = "Confidence in Institutions",
+    stacked_type = "percent",
+    horizontal = TRUE
+  )
+```
 
 
 .eighty[
-
-``` r
-confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %&gt;%
+```{r, eval = F}
+confidence <- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %>%
   add_viz(
     x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic"),
-    x_var_labels = c("Banks &amp; financial institutions", "Major companies",
+    x_var_labels = c("Banks & financial institutions", "Major companies",
                      "Education", "Federal government", "Medicine"),
     title = "Confidence in Institutions",
     stacked_type = "percent",
@@ -1289,12 +1409,11 @@ confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars =
 # Stacked Bars: Step by Step
 
 .eighty[
-
-``` r
-confidence &lt;- create_content(data = gss, `type = "stackedbars"`, `drop_na_vars = TRUE`) %&gt;%
+```{r, eval = F}
+confidence <- create_content(data = gss, `type = "stackedbars"`, `drop_na_vars = TRUE`) %>%
   add_viz(
     x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic"),
-    x_var_labels = c("Banks &amp; financial institutions", "Major companies",
+    x_var_labels = c("Banks & financial institutions", "Major companies",
                      "Education", "Federal government", "Medicine"),
     title = "Confidence in Institutions",
     stacked_type = "percent",
@@ -1311,12 +1430,11 @@ confidence &lt;- create_content(data = gss, `type = "stackedbars"`, `drop_na_var
 # Stacked Bars: Step by Step
 
 .eighty[
-
-``` r
-confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %&gt;%
+```{r, eval = F}
+confidence <- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %>%
   add_viz(
     `x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic")`,
-    `x_var_labels = c("Banks &amp; financial institutions", "Major companies",`,
+    `x_var_labels = c("Banks & financial institutions", "Major companies",`,
                      `"Education", "Federal government", "Medicine")`,
     title = "Confidence in Institutions",
     stacked_type = "percent",
@@ -1333,12 +1451,11 @@ confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars =
 # Stacked Bars: Step by Step
 
 .eighty[
-
-``` r
-confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %&gt;%
+```{r, eval = F}
+confidence <- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %>%
   add_viz(
     x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic"),
-    x_var_labels = c("Banks &amp; financial institutions", "Major companies",
+    x_var_labels = c("Banks & financial institutions", "Major companies",
                      "Education", "Federal government", "Medicine"),
     title = "Confidence in Institutions",
     `stacked_type = "percent"`,
@@ -1354,16 +1471,15 @@ confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars =
 
 # Stacked Bars: Preview
 
-
-``` r
-confidence %&gt;% preview()
+```{r, eval = F}
+confidence %>% preview()
 ```
 
-&lt;iframe src="viz/6.html" width="100%" height="400px" style="border:none;"
+<iframe src="viz/6.html" width="100%" height="400px" style="border:none;"
   onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
-    '&lt;style&gt;.highchart{height:300px !important}&lt;/style&gt;');
-    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
-&lt;/iframe&gt;
+    '<style>.highchart{height:300px !important}</style>');
+    setTimeout(() => this.contentWindow.Highcharts?.charts.forEach(c => c?.reflow()), 500);">
+</iframe>
 
 Great for comparing responses across multiple survey questions!
 
@@ -1375,10 +1491,9 @@ Great for comparing responses across multiple survey questions!
 
 Show the **same variable for different subgroups** side by side:
 
-
-``` r
-filtered &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "happy", title = "Male", filter = ~ sex == "male", tabgroup = "Male") %&gt;%
+```{r, eval = F}
+filtered <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "happy", title = "Male", filter = ~ sex == "male", tabgroup = "Male") %>%
   add_viz(x_var = "happy", title = "Female", filter = ~ sex == "female", tabgroup = "Female")
 ```
 
@@ -1398,10 +1513,9 @@ Notice the `+filter` indicator — filters are applied!
 
 # Filtering: Step by Step
 
-
-``` r
-filtered &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "happy", title = "Male", `filter = ~ sex == "male"`, tabgroup = "Male") %&gt;%
+```{r, eval = F}
+filtered <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "happy", title = "Male", `filter = ~ sex == "male"`, tabgroup = "Male") %>%
   add_viz(x_var = "happy", title = "Female", filter = ~ sex == "female", tabgroup = "Female")
 ```
 
@@ -1415,10 +1529,9 @@ filtered &lt;- create_content(data = gss, type = "bar") %&gt;%
 
 # Filtering: Step by Step
 
-
-``` r
-filtered &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "happy", title = "Male", filter = ~ sex == "male", tabgroup = "Male") %&gt;%
+```{r, eval = F}
+filtered <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "happy", title = "Male", filter = ~ sex == "male", tabgroup = "Male") %>%
   add_viz(x_var = "happy", title = "Female", `filter = ~ sex == "female"`, tabgroup = "Female")
 ```
 
@@ -1430,16 +1543,15 @@ Users can **switch between tabs** to compare happiness distributions!
 
 # Filtering: Preview
 
-
-``` r
-filtered %&gt;% preview()
+```{r, eval = F}
+filtered %>% preview()
 ```
 
-&lt;iframe src="viz/5.html" width="100%" height="350px" style="border:none;"
+<iframe src="viz/5.html" width="100%" height="350px" style="border:none;"
   onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
-    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
-    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
-&lt;/iframe&gt;
+    '<style>.highchart{height:250px !important}</style>');
+    setTimeout(() => this.contentWindow.Highcharts?.charts.forEach(c => c?.reflow()), 500);">
+</iframe>
 
 Each tab shows happiness levels for a different gender: easy comparison!
 
@@ -1480,7 +1592,7 @@ class: inverse, center, middle
 | `title` | Chart title | `"Age Distribution"` |
 | `subtitle` | Secondary title | `"n = 500"` |
 | `tabgroup` | Tab organization | `"demographics"` |
-| `filter` | Subset data | `~ age &gt; 30` |
+| `filter` | Subset data | `~ age > 30` |
 | `color_palette` | Custom colors | `c("#3498DB", "#E74C3C")` |
 | `drop_na_vars` | Remove NA rows | `TRUE` |
 | `weight_var` | Survey weights | `"sample_weight"` |
@@ -1530,24 +1642,23 @@ Content is *reusable*: you can attach the same content to multiple pages!
 
 Most dashboardr code follows this pattern:
 
-
-``` r
+```{r, eval = F}
 # 1. CREATE a container
-create_content(data = my_data, type = "bar") %&gt;%
+create_content(data = my_data, type = "bar") %>%
   # 2. ADD elements to it
-  add_viz(x_var = "category", title = "My Chart") %&gt;%
+  add_viz(x_var = "category", title = "My Chart") %>%
   add_text("## Summary", "Key findings here.")
 ```
 
 --
 
-&lt;br&gt;
+<br>
 
 This works at **every layer**:
 
-- **Content**: `create_content() %&gt;% add_viz() %&gt;% add_text()`
-- **Page**: `create_page() %&gt;% add_content() %&gt;% add_viz()`
-- **Dashboard**: `create_dashboard() %&gt;% add_pages() %&gt;% generate_dashboard()`
+- **Content**: `create_content() %>% add_viz() %>% add_text()`
+- **Page**: `create_page() %>% add_content() %>% add_viz()`
+- **Dashboard**: `create_dashboard() %>% add_pages() %>% generate_dashboard()`
 
 ---
 
@@ -1601,7 +1712,7 @@ You can always consult the documentation as well:
 ]
 
 
-&gt; **ALTERNATIVELY:** user your own data in a similar way!
+> **ALTERNATIVELY:** user your own data in a similar way!
 
 
 ⏱️ **Time:** ~30 minutes
@@ -1647,9 +1758,8 @@ Each page becomes a **separate HTML file** in your final dashboard.
 
 Let's create a simple landing page. It should be very familiar to you at this point:
 
-
-``` r
-home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+```{r, eval = F}
+home <- create_page("Home", is_landing_page = TRUE) %>%
   add_text(
     "# Welcome!",
     "",
@@ -1663,9 +1773,8 @@ This creates a page named "Home" that will be the **default** page visitors see.
 
 # Creating a Page: Step by Step
 
-
-``` r
-*home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+```{r, eval = F}
+{{home <- create_page("Home", is_landing_page = TRUE) %>%}}
   add_text(
     "# Welcome!",
     "",
@@ -1682,14 +1791,13 @@ This creates a page named "Home" that will be the **default** page visitors see.
 
 # Creating a Page: Step by Step
 
-
-``` r
-home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
-*  add_text(
-*    "# Welcome!",
-*    "",
-*    "Explore the GSS data using the navigation above."
-*  )
+```{r, eval = F}
+home <- create_page("Home", is_landing_page = TRUE) %>%
+{{  add_text(}}
+{{    "# Welcome!",}}
+{{    "",}}
+{{    "Explore the GSS data using the navigation above."}}
+{{  )}}
 ```
 
 `add_text()` adds markdown content directly to the page.
@@ -1702,16 +1810,15 @@ Each argument is a line — `""` creates a blank line.
 
 Remember your content collection? Connect it to a page with `add_content()`:
 
-
-``` r
-analysis &lt;- create_page("Analysis", data = gss) %&gt;%
-  add_text("## GSS Results") %&gt;%
+```{r, eval = F}
+analysis <- create_page("Analysis", data = gss) %>%
+  add_text("## GSS Results") %>%
   add_content(demographics)
 ```
 
 --
 
-&lt;br&gt;
+<br>
 
 The `add_content()` function **connects layers**:
 
@@ -1722,10 +1829,9 @@ The `add_content()` function **connects layers**:
 
 # Connecting Content: Step by Step
 
-
-``` r
-*analysis &lt;- create_page("Analysis", data = gss) %&gt;%
-  add_text("## GSS Results") %&gt;%
+```{r, eval = F}
+{{analysis <- create_page("Analysis", data = gss) %>%}}
+  add_text("## GSS Results") %>%
   add_content(demographics)
 ```
 
@@ -1737,10 +1843,9 @@ The `data` argument provides the dataset for visualizations.
 
 # Connecting Content: Step by Step
 
-
-``` r
-analysis &lt;- create_page("Analysis", data = gss) %&gt;%
-*  add_text("## GSS Results") %&gt;%
+```{r, eval = F}
+analysis <- create_page("Analysis", data = gss) %>%
+{{  add_text("## GSS Results") %>%}}
   add_content(demographics)
 ```
 
@@ -1750,11 +1855,10 @@ Add a header to the page using markdown.
 
 # Connecting Content: Step by Step
 
-
-``` r
-analysis &lt;- create_page("Analysis", data = gss) %&gt;%
-  add_text("## GSS Results") %&gt;%
-*  add_content(demographics)
+```{r, eval = F}
+analysis <- create_page("Analysis", data = gss) %>%
+  add_text("## GSS Results") %>%
+{{  add_content(demographics)}}
 ```
 
 Connect your content collection (`demographics`) to this page!
@@ -1767,16 +1871,15 @@ All the visualizations you created will appear here.
 
 You can also add visualizations directly to pages (without a separate content collection):
 
-
-``` r
-quick_page &lt;- create_page("Quick View", data = gss, type = "bar") %&gt;%
-  add_text("## Quick Analysis") %&gt;%
+```{r, eval = F}
+quick_page <- create_page("Quick View", data = gss, type = "bar") %>%
+  add_text("## Quick Analysis") %>%
   add_viz(x_var = "happy", title = "Happiness Levels")
 ```
 
 --
 
-&lt;br&gt;
+<br>
 
 This is handy for simple pages with just one or two charts!
 
@@ -1808,13 +1911,13 @@ Pages can hold all the same content as `create_content()` (visualizations, text,
 
 For straightforward dashboards, add content directly to pages:
 
-
-``` r
+```{r}
 # Everything in one chain
-simple_page &lt;- create_page("Analysis", data = gss, type = "bar") %&gt;%
-  add_text("## Education Distribution", "", "How education levels are distributed.") %&gt;%
-  add_viz(x_var = "degree", title = "Education Levels") %&gt;%
+simple_page <- create_page("Analysis", data = gss, type = "bar") %>%
+  add_text("## Education Distribution", "", "How education levels are distributed.") %>%
+  add_viz(x_var = "degree", title = "Education Levels") %>%
   add_callout("Data from GSS 2022", type = "note")
+
 ```
 
 
@@ -1826,25 +1929,25 @@ simple_page &lt;- create_page("Analysis", data = gss, type = "bar") %&gt;%
 
 For complex dashboards, build content separately, then assemble with `add_content()`:
 
-
-``` r
+```{r}
 # Step 1: Build content pieces separately
-intro_text &lt;- create_content() %&gt;%
+intro_text <- create_content() %>%
   add_text("## Overview", "", "Key findings from the General Social Survey.")
 
-demographic_charts &lt;- create_content(type = "bar") %&gt;%
-  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %&gt;%
+demographic_charts <- create_content(type = "bar") %>%
+  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %>%
   add_viz(x_var = "race", title = "Race", tabgroup = "Demographics")
 
-attitude_charts &lt;- create_content(type = "bar") %&gt;%
-  add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes") %&gt;%
+attitude_charts <- create_content(type = "bar") %>%
+  add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes") %>%
   add_viz(x_var = "polviews", title = "Political Views", tabgroup = "Attitudes")
 
 # Step 2: Assemble into page
-complex_page &lt;- create_page("Full Analysis", data = gss) %&gt;%
-  add_content(intro_text) %&gt;%
-  add_content(demographic_charts) %&gt;%
+complex_page <- create_page("Full Analysis", data = gss) %>%
+  add_content(intro_text) %>%
+  add_content(demographic_charts) %>%
   add_content(attitude_charts)
+
 ```
 
 ---
@@ -1870,13 +1973,12 @@ complex_page &lt;- create_page("Full Analysis", data = gss) %&gt;%
 Pages have several useful options:
 
 .eighty[
-
-``` r
-about &lt;- create_page(
+```{r, eval = F}
+about <- create_page(
   "About",
   navbar_align = "right",    # Position in navigation (left/right)
   icon = "ph:info"           # Add an icon!
-) %&gt;%
+) %>%
   add_text(
     "## About This Dashboard",
     "",
@@ -1887,7 +1989,7 @@ about &lt;- create_page(
 
 --
 
-&lt;br&gt;
+<br>
 
 Icons use the [Iconify](https://icon-sets.iconify.design/) format: `"ph:info"`, `"ph:chart-bar"`, etc.
 
@@ -1897,9 +1999,8 @@ Icons use the [Iconify](https://icon-sets.iconify.design/) format: `"ph:info"`, 
 
 Just like content, you can preview pages:
 
-
-``` r
-analysis %&gt;% preview()
+```{r, eval = F}
+analysis %>% preview()
 ```
 
 This shows how the page will look (approximately) in your final dashboard.
@@ -1947,17 +2048,15 @@ Create pages for your dashboard:
 
 **Step 1:** Create a landing page with welcome text
 
-
-``` r
-home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+```{r, eval = F}
+home <- create_page("Home", is_landing_page = TRUE) %>%
   add_text("# ___", "", "___")
 ```
 
 **Step 2:** Create an analysis page using your content
 
-
-``` r
-analysis &lt;- create_page("Analysis", data = gss) %&gt;%
+```{r, eval = F}
+analysis <- create_page("Analysis", data = gss) %>%
   add_content(___)
 ```
 
@@ -1965,7 +2064,7 @@ analysis &lt;- create_page("Analysis", data = gss) %&gt;%
 
 **Step 4:** Preview each page!
 
-&lt;br&gt;
+<br>
 
 [Click Here](https://favstats.github.io/dashboardr/articles/pages.html) for pages deep dive.
 
@@ -2003,13 +2102,12 @@ The **dashboard** is the final layer that brings pages together.
 
 # Creating a Dashboard: Overview
 
-
-``` r
-my_dashboard &lt;- create_dashboard(
+```{r, eval = F}
+my_dashboard <- create_dashboard(
   title = "GSS Explorer",
   output_dir = "my_dashboard",
   theme = "cosmo"
-) %&gt;%
+) %>%
   add_pages(home, analysis, about)
 ```
 
@@ -2024,13 +2122,12 @@ This creates a dashboard with:
 
 # Creating a Dashboard: Step by Step
 
-
-``` r
-my_dashboard &lt;- create_dashboard(
-*  title = "GSS Explorer",
+```{r, eval = F}
+my_dashboard <- create_dashboard(
+{{  title = "GSS Explorer",}}
   output_dir = "my_dashboard",
   theme = "cosmo"
-) %&gt;%
+) %>%
   add_pages(home, analysis, about)
 ```
 
@@ -2040,13 +2137,12 @@ my_dashboard &lt;- create_dashboard(
 
 # Creating a Dashboard: Step by Step
 
-
-``` r
-my_dashboard &lt;- create_dashboard(
+```{r, eval = F}
+my_dashboard <- create_dashboard(
   title = "GSS Explorer",
-*  output_dir = "my_dashboard",
+{{  output_dir = "my_dashboard",}}
   theme = "cosmo"
-) %&gt;%
+) %>%
   add_pages(home, analysis, about)
 ```
 
@@ -2056,13 +2152,12 @@ my_dashboard &lt;- create_dashboard(
 
 # Creating a Dashboard: Step by Step
 
-
-``` r
-my_dashboard &lt;- create_dashboard(
+```{r, eval = F}
+my_dashboard <- create_dashboard(
   title = "GSS Explorer",
   output_dir = "my_dashboard",
-*  theme = "cosmo"
-) %&gt;%
+{{  theme = "cosmo"}}
+) %>%
   add_pages(home, analysis, about)
 ```
 
@@ -2074,14 +2169,13 @@ Options: `"cosmo"`, `"flatly"`, `"journal"`, `"lux"`, `"minty"`, `"pulse"`, `"sa
 
 # Creating a Dashboard: Step by Step
 
-
-``` r
-my_dashboard &lt;- create_dashboard(
+```{r, eval = F}
+my_dashboard <- create_dashboard(
   title = "GSS Explorer",
   output_dir = "my_dashboard",
   theme = "cosmo"
-) %&gt;%
-*  add_pages(home, analysis, about)
+) %>%
+{{  add_pages(home, analysis, about)}}
 ```
 
 `add_pages()` — adds your pages to the dashboard.
@@ -2094,8 +2188,7 @@ Pages appear in the navbar **in the order you add them**.
 
 Use `print()` to see the full structure:
 
-
-``` r
+```{r, eval = F}
 print(my_dashboard)
 ```
 
@@ -2116,15 +2209,14 @@ Pages (3):
 
 When you're ready, generate the final HTML:
 
-
-``` r
-my_dashboard %&gt;%
+```{r, eval = F}
+my_dashboard %>%
   generate_dashboard(render = TRUE, open = "browser")
 ```
 
 --
 
-&lt;br&gt;
+<br>
 
 This:
 
@@ -2136,10 +2228,9 @@ This:
 
 # Generate Options
 
-
-``` r
-my_dashboard %&gt;%
-*  generate_dashboard(render = TRUE, open = "browser")
+```{r, eval = F}
+my_dashboard %>%
+{{  generate_dashboard(render = TRUE, open = "browser")}}
 ```
 
 - `render = TRUE` — actually build the HTML (set `FALSE` to just create .qmd files)
@@ -2151,14 +2242,13 @@ my_dashboard %&gt;%
 
 You can also preview the dashboard without generating everything:
 
-
-``` r
-my_dashboard %&gt;% preview()
+```{r, eval = F}
+my_dashboard %>% preview()
 ```
 
 --
 
-&lt;br&gt;
+<br>
 
 This is faster for quick checks while you're building!
 
@@ -2169,9 +2259,8 @@ This is faster for quick checks while you're building!
 More configuration options:
 
 .eighty[
-
-``` r
-my_dashboard &lt;- create_dashboard(
+```{r, eval = F}
+my_dashboard <- create_dashboard(
   title = "GSS Explorer",
   output_dir = "my_dashboard",
   theme = "flatly",
@@ -2226,21 +2315,19 @@ Bring everything together!
 
 **Step 1:** Create your dashboard
 
-
-``` r
-my_dashboard &lt;- create_dashboard(
+```{r, eval = F}
+my_dashboard <- create_dashboard(
   title = "___",
   output_dir = "___",
   theme = "___"
-) %&gt;%
+) %>%
   add_pages(___, ___, ___)
 ```
 
 **Step 2:** Generate your dashboard!
 
-
-``` r
-my_dashboard %&gt;% 
+```{r, eval = F}
+my_dashboard %>% 
   generate_dashboard(render = TRUE, open = "browser")
 ```
 
@@ -2268,15 +2355,13 @@ class: inverse, center, middle
 
 **First time (publish):**
 
-
-``` r
+```{r, eval = F}
 publish_dashboard()
 ```
 
 **Updates:**
 
-
-``` r
+```{r, eval = F}
 update_dashboard(message = "Added new charts")
 ```
 
@@ -2308,7 +2393,7 @@ Your URL: `https://USERNAME.github.io/dashboard-name/`
 
 class: center, middle, inverse
 
-## Part 4: Theming &amp; Styling
+## Part 4: Theming & Styling
 
 ### Make your dashboard beautiful!
 
@@ -2322,11 +2407,10 @@ class: center, middle, inverse
 ### 1. Bootswatch Themes
 Overall look and feel
 
-
-``` r
+```{r}
 create_dashboard(
   ...,
-* theme = "flatly"
+{{ theme = "flatly"}}
 )
 ```
 
@@ -2339,11 +2423,10 @@ Browse: https://bootswatch.com/
 ### 2. Tabset Themes
 Tab styling
 
-
-``` r
+```{r}
 create_dashboard(
   ...,
-* tabset_theme = "modern"
+{{ tabset_theme = "modern"}}
 )
 ```
 
@@ -2360,10 +2443,9 @@ Options:
 
 ## Built-in Theme Functions
 
-
-``` r
-dashboard %&gt;%
-* apply_theme(theme_modern())
+```{r}
+dashboard %>%
+{{ apply_theme(theme_modern())}}
 ```
 
 | Function | Style |
@@ -2377,8 +2459,7 @@ dashboard %&gt;%
 
 ### With Color Variants
 
-
-``` r
+```{r}
 apply_theme(theme_modern("purple"))  # Purple accent
 apply_theme(theme_modern("green"))   # Green accent
 apply_theme(theme_academic(accent_color = "#8B0000"))  # Custom
@@ -2388,26 +2469,25 @@ apply_theme(theme_academic(accent_color = "#8B0000"))  # Custom
 
 ## Deep Customization
 
-
-``` r
-dashboard %&gt;%
+```{r}
+dashboard %>%
   apply_theme(
     theme_modern("purple"),
     
     # Typography
-*   mainfont = "Inter",
-*   fontsize = "18px",
-*   fontcolor = "#1f2937",
-*   linkcolor = "#2563eb",
+{{   mainfont = "Inter",}}
+{{   fontsize = "18px",}}
+{{   fontcolor = "#1f2937",}}
+{{   linkcolor = "#2563eb",}}
     
     # Code styling
-*   monofont = "Fira Code",
-*   monobackgroundcolor = "#f8fafc",
+{{   monofont = "Fira Code",}}
+{{   monobackgroundcolor = "#f8fafc",}}
     
     # Layout
-*   navbar_bg_color = "#1e40af",
-*   navbar_text_color = "#ffffff",
-*   max_width = "1400px",
+{{   navbar_bg_color = "#1e40af",}}
+{{   navbar_text_color = "#ffffff",}}
+{{   max_width = "1400px",}}
     
     # Spacing
     margin_left = "2rem",
@@ -2419,18 +2499,17 @@ dashboard %&gt;%
 
 ## Custom Tab Colors
 
-
-``` r
+```{r}
 create_dashboard(
   ...,
   tabset_theme = "modern",
-* tabset_colors = list(
-*   active_bg = "#3498DB",
-*   active_text = "#FFFFFF",
-*   inactive_bg = "#ECF0F1",
-*   inactive_text = "#7F8C8D",
-*   hover_bg = "#BDC3C7"
-* )
+{{ tabset_colors = list(}}
+{{   active_bg = "#3498DB",}}
+{{   active_text = "#FFFFFF",}}
+{{   inactive_bg = "#ECF0F1",}}
+{{   inactive_text = "#7F8C8D",}}
+{{   hover_bg = "#BDC3C7"}}
+{{ )}}
 )
 ```
 
@@ -2474,18 +2553,17 @@ Match your tabset colors to your organization's brand colors for a cohesive look
 
 ## Using Icons
 
-
-``` r
+```{r}
 # In pages
 add_page("Home", icon = "ph:house-fill")
 
 # In text
-md_text("## Features {{&lt; iconify ph:sparkle-fill &gt;}}")
+md_text("## Features {{< iconify ph:sparkle-fill >}}")
 
 # In tab labels
 set_tabgroup_labels(list(
-* demographics = "{{&lt; iconify ph:users-fill &gt;}} Demographics",
-* feedback = "{{&lt; iconify ph:heart-fill &gt;}} Feedback"
+{{ demographics = "{{< iconify ph:users-fill >}} Demographics",}}
+{{ feedback = "{{< iconify ph:heart-fill >}} Feedback"}}
 ))
 ```
 
@@ -2585,15 +2663,14 @@ Work through the **dashboardr worksheet** at your own pace!
 Break down `polviews` by **age**, **gender**, and **race** — like in the [AI Opinion Monitor](https://algorithmicsociety.github.io/ai-opinion-monitor/)!
 
 .seventy[
-
-``` r
-political_views_collection &lt;- create_content(data = gss, type = "bar") %&gt;%
-  add_viz(x_var = "polviews", title = "Overall Views", tabgroup = "Political Views") %&gt;% 
+```{r, eval = F}
+political_views_collection <- create_content(data = gss, type = "bar") %>%
+  add_viz(x_var = "polviews", title = "Overall Views", tabgroup = "Political Views") %>% 
   add_viz(tabgroup = "By Gender", type = "stackedbar",
           data = gss_clean,
           x_var = "sex", stack_var = "polviews",
           title = "Political Views by Gender",
-          stacked_type = "percent") %&gt;%
+          stacked_type = "percent") %>%
   add_viz(tabgroup = "By Age", type = "stackedbar",
           data = gss_clean,
           x_var = "age_num", stack_var = "polviews",
@@ -2621,146 +2698,7 @@ Check the [stackedbars vignette](https://favstats.github.io/dashboardr/articles/
   - [Content Collections](https://favstats.github.io/dashboardr/articles/content-collections.html) — visualization types, tabgroups
   - [Pages](https://favstats.github.io/dashboardr/articles/pages.html) — page options, icons
   - [Dashboards](https://favstats.github.io/dashboardr/articles/dashboards.html) — themes, navigation
-  - [Advanced Features](https://favstats.github.io/dashboardr/articles/advanced-features.html) — tips &amp; debugging
+  - [Advanced Features](https://favstats.github.io/dashboardr/articles/advanced-features.html) — tips & debugging
   - [Publishing](https://favstats.github.io/dashboardr/articles/publishing_dashboards.html) — GitHub Pages deployment
 
 - **Source code**: [github.com/favstats/dashboardr](https://github.com/favstats/dashboardr)
-    </textarea>
-<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
-<script>var slideshow = remark.create({
-  "highlightStyle": "github",
-  "highlightLines": true,
-  "highlightSpans": true,
-  "countIncrementalSlides": false,
-  "slideNumberFormat": "%current%<br>",
-  "ratio": "16:9"
-});
-if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
-  window.dispatchEvent(new Event('resize'));
-});
-(function(d) {
-  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
-  if (!r) return;
-  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
-  d.head.appendChild(s);
-})(document);
-
-(function(d) {
-  var el = d.getElementsByClassName("remark-slides-area");
-  if (!el) return;
-  var slide, slides = slideshow.getSlides(), els = el[0].children;
-  for (var i = 1; i < slides.length; i++) {
-    slide = slides[i];
-    if (slide.properties.continued === "true" || slide.properties.count === "false") {
-      els[i - 1].className += ' has-continuation';
-    }
-  }
-  var s = d.createElement("style");
-  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
-  d.head.appendChild(s);
-})(document);
-// delete the temporary CSS (for displaying all slides initially) when the user
-// starts to view slides
-(function() {
-  var deleted = false;
-  slideshow.on('beforeShowSlide', function(slide) {
-    if (deleted) return;
-    var sheets = document.styleSheets, node;
-    for (var i = 0; i < sheets.length; i++) {
-      node = sheets[i].ownerNode;
-      if (node.dataset["target"] !== "print-only") continue;
-      node.parentNode.removeChild(node);
-    }
-    deleted = true;
-  });
-})();
-// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
-// screen reader (see PR #262)
-(function(d) {
-  let res = {};
-  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
-    const t = tr.querySelector('td:nth-child(2)').innerText;
-    tr.querySelectorAll('td:first-child .key').forEach(key => {
-      const k = key.innerText;
-      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
-    });
-  });
-  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
-})(document);
-(function() {
-  "use strict"
-  // Replace <script> tags in slides area to make them executable
-  var scripts = document.querySelectorAll(
-    '.remark-slides-area .remark-slide-container script'
-  );
-  if (!scripts.length) return;
-  for (var i = 0; i < scripts.length; i++) {
-    var s = document.createElement('script');
-    var code = document.createTextNode(scripts[i].textContent);
-    s.appendChild(code);
-    var scriptAttrs = scripts[i].attributes;
-    for (var j = 0; j < scriptAttrs.length; j++) {
-      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
-    }
-    scripts[i].parentElement.replaceChild(s, scripts[i]);
-  }
-})();
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-// adds .remark-code-has-line-highlighted class to <pre> parent elements
-// of code chunks containing highlighted lines with class .remark-code-line-highlighted
-(function(d) {
-  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
-  const preParents = [];
-  const findPreParent = function(line, p = 0) {
-    if (p > 1) return null; // traverse up no further than grandparent
-    const el = line.parentElement;
-    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
-  };
-
-  for (let line of hlines) {
-    let pre = findPreParent(line);
-    if (pre && !preParents.includes(pre)) preParents.push(pre);
-  }
-  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
-})(document);</script>
-
-<script>
-slideshow._releaseMath = function(el) {
-  var i, text, code, codes = el.getElementsByTagName('code');
-  for (i = 0; i < codes.length;) {
-    code = codes[i];
-    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
-      text = code.textContent;
-      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
-          /^\$\$(.|\s)+\$\$$/.test(text) ||
-          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
-        code.outerHTML = code.innerHTML;  // remove <code></code>
-        continue;
-      }
-    }
-    i++;
-  }
-};
-slideshow._releaseMath(document);
-</script>
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-(function () {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
-  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
-    script.src  = script.src.replace(/^https?:/, '');
-  document.getElementsByTagName('head')[0].appendChild(script);
-})();
-</script>
-  </body>
-</html>
