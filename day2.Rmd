@@ -696,6 +696,9 @@ class: inverse, center, middle
 
 Each layer flows into the next using pipes (`%>%`), making your code **readable** and **modular**.
 
+
+[**Please throughout this tutorial consider following also along in the documentation!**](https://favstats.github.io/dashboardr/articles/getting-started.html)
+
 --
 
 ```{r, eval = F}
