@@ -580,7 +580,7 @@ about &lt;- create_page("About", navbar_align = "right", icon = "ph:info") %&gt;
 
 # LAYER 3: Assemble dashboard
 my_dashboard &lt;- create_dashboard(
-  title = "GSS Explorer", output_dir = "gss_dashboard", theme = "flatly"
+  title = "GSS Explorer", output_dir = "gss_dashboard", publish_dir = "../docs", theme = "flatly"
 ) %&gt;%
   add_pages(home, analysis, about)
 
@@ -2008,6 +2008,7 @@ The **dashboard** is the final layer that brings pages together.
 my_dashboard &lt;- create_dashboard(
   title = "GSS Explorer",
   output_dir = "my_dashboard",
+  publish_dir = "../docs",
   theme = "cosmo"
 ) %&gt;%
   add_pages(home, analysis, about)
@@ -2016,7 +2017,8 @@ my_dashboard &lt;- create_dashboard(
 This creates a dashboard with:
 
 - A title for the browser tab
-- Output directory for generated files
+- Output directory for source files
+- Publish directory for rendered HTML
 - A visual theme
 - Your pages in the navigation
 
@@ -2029,6 +2031,7 @@ This creates a dashboard with:
 my_dashboard &lt;- create_dashboard(
 *  title = "GSS Explorer",
   output_dir = "my_dashboard",
+  publish_dir = "../docs",
   theme = "cosmo"
 ) %&gt;%
   add_pages(home, analysis, about)
@@ -2045,12 +2048,13 @@ my_dashboard &lt;- create_dashboard(
 my_dashboard &lt;- create_dashboard(
   title = "GSS Explorer",
 *  output_dir = "my_dashboard",
+  publish_dir = "../docs",
   theme = "cosmo"
 ) %&gt;%
   add_pages(home, analysis, about)
 ```
 
-`output_dir` — folder where all files will be generated.
+`output_dir` — folder where **source files** (.qmd) will be created.
 
 ---
 
@@ -2061,6 +2065,74 @@ my_dashboard &lt;- create_dashboard(
 my_dashboard &lt;- create_dashboard(
   title = "GSS Explorer",
   output_dir = "my_dashboard",
+*  publish_dir = "../docs",
+  theme = "cosmo"
+) %&gt;%
+  add_pages(home, analysis, about)
+```
+
+`publish_dir` — folder where **rendered HTML** files end up.
+
+- The `../` moves **up one level** from `output_dir`
+- Typical for GitHub Pages: HTML lands in `docs/` at project root
+
+---
+
+
+# Understanding `output_dir` and `publish_dir`
+
+.pull-left[
+### `output_dir`
+Where your **source files** (.qmd) are created
+
+
+``` r
+create_dashboard(
+  output_dir = "my_dashboard",
+  ...
+)
+```
+
+Creates: `my_dashboard/_quarto.yml`, `my_dashboard/index.qmd`, etc.
+]
+
+.pull-right[
+### `publish_dir`
+Where your **rendered HTML** files end up
+
+
+``` r
+create_dashboard(
+  output_dir = "my_dashboard",
+  `publish_dir = "../docs"`,
+  ...
+)
+```
+
+The `../` moves **up one level** from `output_dir`!
+]
+
+--
+
+&lt;br&gt;
+
+.center[
+**Typical setup for GitHub Pages:**
+
+`output_dir = "dashboard"` + `publish_dir = "../docs"` → HTML in `docs/` folder (project root)
+]
+
+---
+
+
+# Creating a Dashboard: Step by Step
+
+
+``` r
+my_dashboard &lt;- create_dashboard(
+  title = "GSS Explorer",
+  output_dir = "my_dashboard",
+  publish_dir = "../docs",
 *  theme = "cosmo"
 ) %&gt;%
   add_pages(home, analysis, about)
@@ -2079,6 +2151,7 @@ Options: `"cosmo"`, `"flatly"`, `"journal"`, `"lux"`, `"minty"`, `"pulse"`, `"sa
 my_dashboard &lt;- create_dashboard(
   title = "GSS Explorer",
   output_dir = "my_dashboard",
+  publish_dir = "../docs",
   theme = "cosmo"
 ) %&gt;%
 *  add_pages(home, analysis, about)
@@ -2174,6 +2247,7 @@ More configuration options:
 my_dashboard &lt;- create_dashboard(
   title = "GSS Explorer",
   output_dir = "my_dashboard",
+  publish_dir = "../docs",
   theme = "flatly",
   search = TRUE,              # Add search functionality
   repo_url = "https://github.com/you/repo",  # Link to source
@@ -2231,6 +2305,7 @@ Bring everything together!
 my_dashboard &lt;- create_dashboard(
   title = "___",
   output_dir = "___",
+  publish_dir = "../docs",
   theme = "___"
 ) %&gt;%
   add_pages(___, ___, ___)
