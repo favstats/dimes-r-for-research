@@ -1,0 +1,2821 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>dashboardr hackathon</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="     Fabio Votta   Alexndra Pafford   Max Paulus   Ernesto de Léon        favstats.github.io/dimes-r-for-research/day2    2026-02-04" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# dashboardr hackathon
+]
+.subtitle[
+## Building Beautiful Interactive Dashboards in R
+]
+.author[
+### <br><br><br><br> Fabio Votta <br> Alexndra Pafford <br> Max Paulus <br> Ernesto de Léon <br> </a> <br> <a href="https://favstats.github.io/dimes-r-for-research/hackathon"> <i class="fa fa-paper-plane fa-fw"></i> favstats.github.io/dimes-r-for-research/day2 </a> <br><br>2026-02-04
+]
+
+---
+
+
+&lt;style&gt;
+/* Override title slide background for day 2 */
+.title-slide {
+  background-image: url(https://favstats.github.io/dashboardr/reference/figures/logo.svg) !important;
+  background-position: right center !important;
+  background-repeat: no-repeat !important;
+  background-size: auto 80% !important;
+}
+
+.title-slide, .title-slide h1, .title-slide h2, .title-slide h3 {
+  color: #FFFFFF !important;
+}
+
+.title-slide a {
+  color: #FFFFFF !important;
+}
+
+.onehundredtwenty {
+  font-size: 120%;
+   }
+
+.ninety {
+  font-size: 90%;
+   }
+
+.eightyfive {
+  font-size: 85%;
+   }
+   
+.eighty {
+  font-size: 80%;
+   }
+   
+.seventyfive {
+  font-size: 75%;
+   }
+   
+.seventy {
+  font-size: 70%;
+   }
+   
+   .sixty {
+  font-size: 60%;
+   }
+   
+.fivty {
+  font-size: 50%;
+   }
+
+/* Style plain code blocks to match R code chunks */
+.remark-code {
+  background-color: #f5f5f5 !important;
+  color: #333333 !important;
+  border: 1px solid #ddd !important;
+  border-radius: 6px !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+
+/* Ensure code lines also have the background */
+.remark-code-line {
+  background-color: #f5f5f5 !important;
+  color: #333333 !important;
+  display: block;
+  padding: 0 0.8em;
+}
+
+/* Keep highlighted lines visible - override the gray */
+.remark-code-line-highlighted {
+  background-color: rgba(255, 255, 0, 0.5) !important;
+}
+
+/* Animated drum roll */
+.drum-roll {
+  font-size: 300%;
+  display: inline-block;
+  animation: drumBounce 0.3s ease-in-out infinite alternate;
+}
+
+.drum-roll span {
+  display: inline-block;
+  animation: drumShake 0.15s ease-in-out infinite;
+}
+
+.drum-roll span:nth-child(odd) {
+  animation-delay: 0.075s;
+}
+
+@keyframes drumBounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+@keyframes drumShake {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+/* Silly logo entrance animation */
+.silly-logo {
+  display: inline-block;
+  animation: sillyEntrance 1.5s ease-out forwards;
+}
+
+.silly-logo img {
+  width: 400px;
+  height: auto;
+}
+
+@keyframes sillyEntrance {
+  0% {
+    transform: scale(0) rotate(-720deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3) rotate(20deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.9) rotate(-10deg);
+  }
+  85% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+
+--.small-code .remark-code {
+  font-size: 70%;
+}
+
+.tiny-code .remark-code {
+  font-size: 60%;
+}
+&lt;/style&gt;
+
+
+
+
+
+
+
+
+class: inverse, center, middle
+
+# Welcome to dashboardr! 
+
+## From Zero to Published Dashboard
+
+![](https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif)
+
+
+---
+
+# What We'll Cover Today
+
+.pull-left[
+### Layer 1: Content
+- `create_content()` basics
+- Adding visualizations with `add_viz()`
+- Organizing with tabgroups
+
+### Layer 2: Pages
+- `create_page()` for navigation
+- Adding text with `add_text()`
+- Connecting content to pages
+]
+
+--
+
+.pull-right[
+### Layer 3: Dashboards
+- `create_dashboard()` configuration
+- Adding pages with `add_pages()`
+- Generating with `generate_dashboard()`
+
+### Bonus
+- Complete working example
+- Function reference
+- Tips &amp; best practices
+]
+
+--
+
+.center[
+**By the end, you'll have built a complete, interactive dashboard from scratch!**
+]
+
+---
+
+
+class: inverse, center, middle
+
+# Part 0
+## The Problem
+
+---
+
+# Problem: Our data is not &lt;u&gt;accessible&lt;/u&gt; to the public
+
+--
+
+
+🤓 Akshually, it is accessible in our papers
+
+--
+
+**BUT non-academic public do not want to (or simply cant!) read our papers**
+
+
+![](images/nonaccessible.png)
+
+---
+
+# Problem: Our data is not &lt;u&gt;accessible&lt;/u&gt; to the public
+
+--
+
+
+🤓 Akshually, it is on osf/figshare
+
+--
+
+**BUT data sharing tools are aimed at academics**
+
+Problem for: 
++ General public
++ Journalists
++ Policy makers
+
+--
+
+Need a solution that is:
+
+**For the public**
++ Easy to interact with
++ Aesthetically appealing
++ Allows customization
++ Always available
+
+
+
+---
+
+# And the answer is: DASHBOARDS
+
+
+---
+
+# And the answer is: DASHBOARDS
+
+&lt;br&gt;
+
+![](images/dashboards.png)
+
+---
+
+# And the answer is: DASHBOARDS
+
+![](https://www.campaigntracker.nl/posts/media.jpg)
+
+---
+
+# Responding to Our Own Actual Needs
+
+AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
+
+&lt;br&gt;
+
++ For other researchers in the consortium without data wrangling expertise
+
++ The Dutch public
+
++ Input for blogs and reports
+
+
+.pull-right[
+![](https://cdh.uu.nl/wp-content/uploads/sites/1086/2024/09/Logo-AlgoSoc-2-3-e1727184011926.png)
+
+
+]
+
+
+
+---
+
+# Responding to Our Own Actual Needs
+
+
+![](images/algosoc.png)
+
+---
+
+# Need a solution that is:
+
+.pull-left[
+### For the public:
+
++ Easy to interact with ✅ 
++ Aesthetically appealing ✅
++ Allows customization ✅
++ Always available ✅
+]
+
+--
+
+.pull-right[
+### For academics:
+
++ Easy to make with limited computational knowledge ❌
+
+&lt;br&gt;
+
+*This is where dashboardr comes in!*
+]
+
+---
+
+# Responding to Our Own Actual Needs
+
+### DigIQ and Ministry of the Interior
+
++ Ministry of the Interior needed way to communicate DigIQ survey results
++ Approached us about creating a similar dashboard
+
+--
+
+### Why not create a tool that would allow us to:
+
++ Save ourselves some work
++ Allow others to make these themselves
++ Applied for DigiCom funds to make this a reality
+
+--
+
+.center[
+**GOT SOME FUNDING YAY!** 🎉
+]
+
+
+
+---
+
+
+![](images/digiq.png)
+
+---
+
+# And now you can do this YOURSELF thanks to…
+
+&lt;br&gt;
+&lt;br&gt;
+
+&lt;center&gt;
+&lt;div class="drum-roll"&gt;
+&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;&lt;span&gt;🥁&lt;/span&gt;
+&lt;/div&gt;
+&lt;/center&gt;
+
+
+---
+
+# Introducing `dashboardr`
+
+&lt;center&gt;
+&lt;div class="silly-logo"&gt;
+&lt;img src="https://favstats.github.io/dashboardr/reference/figures/logo.svg"&gt;
+&lt;/div&gt;
+&lt;/center&gt;
+
+---
+
+
+# Introducing `dashboardr`
+
+
+.pull-left[
+&lt;img src="images/dasher.png" style="width:70%;"&gt;
+]
+
+.pull-right[
+&lt;img src="https://favstats.github.io/dashboardr/reference/figures/logo.svg" style="width:70%;"&gt;
+]
+
+
+.pull-right[
+&gt; Logo courtesy of Vivien Fabry :)
+]
+
+
+---
+
+&lt;br&gt;
+&lt;center&gt;
+
+&lt;img src="images/aj2u8p.jpg" style="width:70%;"&gt;
+
+
+
+&lt;/center&gt;
+
+---
+
+# The IDEA &amp; SPECS
+
+.pull-left[
+### Core Philosophy
+
+**Pipeable, tidyverse style** `%&gt;%`
+
+&lt;br&gt;
+
+### Static HTML with Quarto
+
+- No server needed (unlike Shiny!)
+- No hosting costs
+- Always fast &amp; available
+]
+
+--
+
+.pull-right[
+&lt;img src="https://rstudio.github.io/cheatsheets/html/images/logo-quarto.png" style="width: 180px; float: right; margin-left: 20px;"&gt;
+
+### Easy &amp; Accessible
+
+- **NO** HTML/CSS/JS knowledge needed
+- **Ready-made** interactive visualizations
+- **Simple** theming &amp; customization
+]
+
+--
+
+.center[
+.key-point[
+**The ambitious goal:** A *grammar of dashboards*... like ggplot2 for plots!
+]
+]
+
+---
+
+# WHAT IS A GRAMMAR IN CODING CONTEXT?
+
+![](images/grammar0.png)
+
+
+---
+
+# A GRAMMAR OF DASHBOARDS
+
+![](https://favstats.github.io/dashboardr/articles/workflow_example.png)
+
+---
+
+# Installation
+
+
+``` r
+# Install pak (package manager)
+install.packages("devtools")
+
+# Install dashboardr from GitHub
+devtools::install_github("favstats/dashboardr")
+```
+
+--
+
+
+``` r
+# Load packages
+library(dashboardr)
+```
+
+--
+
+.tip[
+**Important:** Also install Quarto CLI: https://quarto.org/docs/get-started/
+]
+
+---
+
+
+class: inverse, center, middle
+
+# Complete Example
+## Your First Dashboard in 1 Minute
+
+![](https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif)
+
+---
+
+# Full Working Example
+
+.sixty[
+
+``` r
+library(dashboardr)
+library(dplyr)
+library(gssr)
+
+# Load GSS data
+data(gss_all)
+gss &lt;- gss_all %&gt;%
+  select(year, age, sex, race, degree, happy, polviews) %&gt;%
+  filter(year == max(year, na.rm = TRUE), !is.na(degree))
+
+# LAYER 1: Build content
+demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "degree", title = "Education", tabgroup = "Overview") %&gt;%
+  add_viz(x_var = "race", title = "Race", tabgroup = "Overview") %&gt;%
+  add_viz(x_var = "sex", title = "Gender", tabgroup = "Overview")
+
+# LAYER 2: Create pages
+home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+  add_text("# GSS Explorer", "", "Explore the General Social Survey data.")
+
+analysis &lt;- create_page("Analysis", data = gss, icon = "ph:chart-bar") %&gt;%
+  add_content(demographics)
+
+about &lt;- create_page("About", navbar_align = "right", icon = "ph:info") %&gt;%
+  add_text("## About", "", "Built with [dashboardr](https://github.com/favstats/dashboardr)")
+
+# LAYER 3: Assemble dashboard
+my_dashboard &lt;- create_dashboard(
+  title = "GSS Explorer", output_dir = "gss_dashboard", publish_dir = "../docs", theme = "flatly"
+) %&gt;%
+  add_pages(home, analysis, about)
+
+# Generate!
+my_dashboard %&gt;% generate_dashboard(render = TRUE, open = "browser")
+```
+]
+
+---
+
+# The Result
+
+Copy-paste that code, run it, and you'll have:
+
+.pull-left[
+- ✅ A **landing page** with welcome text
+- ✅ An **analysis page** with interactive charts
+- ✅ An **about page** with attribution
+]
+
+.pull-right[
+- ✅ A **themed**, **responsive** dashboard
+- ✅ **Search** functionality
+- ✅ **Professional** look out of the box
+]
+
+--
+
+&lt;br&gt;
+
+.center[
+### All in about 30 lines of code! 🎉
+]
+
+---
+
+class: inverse, center, middle
+
+# Core Concepts: 3 Layers
+
+![](https://media.giphy.com/media/3o7btNa0RUYa5E7iiQ/giphy.gif)
+
+---
+
+# How dashboardr Works
+
+
+.center[
+![](https://favstats.github.io/dashboardr/articles/workflow_example.png)
+]
+
+---
+
+# The Three Layers
+
+&lt;br&gt;
+
+| Layer | Purpose | Key Functions |
+|-------|---------|---------------|
+| **Content** | What to show | `create_content()`, `add_viz()`, `add_text()` |
+| **Page** | Where content lives | `create_page()`, `add_content()` |
+| **Dashboard** | Final output + config | `create_dashboard()`, `add_pages()` |
+
+
+--
+
+&lt;br&gt;
+
+Each layer flows into the next using pipes (`%&gt;%`), making your code **readable** and **modular**.
+
+
+[**Please throughout this tutorial consider following also along in the documentation!**](https://favstats.github.io/dashboardr/articles/getting-started.html)
+
+--
+
+
+``` r
+# The typical pattern
+content %&gt;% page %&gt;% dashboard
+```
+
+---
+
+class: inverse, center, middle
+
+# Layer 1: Content
+
+## Building Visualizations and More
+
+![](https://i.gifer.com/3ut0.gif)
+
+---
+
+# What is Content?
+
+**Content collections** hold your visualizations, text, and much more. A container for everything you want to display.
+
+
+| Function | Purpose |
+|----------|---------|
+| `add_viz()` | Visualization |
+| `add_text()` | Markdown text |
+| `add_callout()` | Note/tip/warning box |
+| `add_image()` | Image |
+| `add_accordion()` | Collapsible section |
+| `add_card()` | Card container |
+| `add_value_box()` | KPI metric |
+| `add_spacer()` | Vertical space |
+| `add_divider()` | Horizontal line |
+| `add_code()` | Code block |
+
+and more! [See Here](https://favstats.github.io/dashboardr/articles/content-collections.html#visualization-types) for full overview.
+
+
+---
+
+# Loading the Data - Paste this in the Beginning of your Script!
+
+.fivty[
+
+``` r
+library(dashboardr)
+library(gssr)
+
+# Load GSS data
+data(gss_all)
+
+# Latest wave only (for most examples)
+gss &lt;- gss_all %&gt;%
+  select(year, age, sex, race, degree, happy, polviews, wtssps,
+         educ, childs,  # Continuous variables for scatter plots
+         confinan, conbus, coneduc, confed, conmedic) %&gt;%  # Confidence in institutions
+  filter(year == max(year, na.rm = TRUE)) %&gt;%
+  filter(
+    happy %in% 1:3,        # very happy, pretty happy, not too happy
+    polviews %in% 1:7,     # extremely liberal to extremely conservative
+    !is.na(age), !is.na(sex), !is.na(race), !is.na(degree)
+  ) %&gt;%
+  mutate(
+    happy = droplevels(as_factor(happy)),
+    polviews = droplevels(as_factor(polviews)),
+    degree = droplevels(as_factor(degree)),
+    sex = droplevels(as_factor(sex)),
+    race = droplevels(as_factor(race)),
+    # Confidence variables: convert non-substantive to NA
+    confinan = ifelse(confinan %in% 1:3, confinan, NA),
+    conbus = ifelse(conbus %in% 1:3, conbus, NA),
+    coneduc = ifelse(coneduc %in% 1:3, coneduc, NA),
+    confed = ifelse(confed %in% 1:3, confed, NA),
+    conmedic = ifelse(conmedic %in% 1:3, conmedic, NA),
+    # Convert to labeled factors
+    confinan = factor(confinan, levels = 1:3, labels = c("a great deal", "only some", "hardly any")),
+    conbus = factor(conbus, levels = 1:3, labels = c("a great deal", "only some", "hardly any")),
+    coneduc = factor(coneduc, levels = 1:3, labels = c("a great deal", "only some", "hardly any")),
+    confed = factor(confed, levels = 1:3, labels = c("a great deal", "only some", "hardly any")),
+    conmedic = factor(conmedic, levels = 1:3, labels = c("a great deal", "only some", "hardly any"))
+  )
+
+# Full time series (for timeline examples)
+gss_timeline &lt;- gss_all %&gt;%
+  select(year, happy) %&gt;%
+  filter(happy %in% 1:3, !is.na(year)) %&gt;%
+  mutate(happy = droplevels(as_factor(happy)))
+```
+]
+
+---
+
+# Creating Content: Overview
+
+Let's create a simple content collection, and the most common one you will want to have, a visualization
+
+We start with `create_content`, our collection for content or as we refer to it here a `content collection`.
+
+
+``` r
+create_content()
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+⚠ Empty collection
+```
+
+Right now it is empty.
+
+---
+
+
+# Creating Content: Overview
+
+Now we are adding some data and visualizations to our container!
+
+
+``` r
+create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = degree, title = "Education Level")
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+1 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education Level (bar) x=degree
+```
+
+This finally creates our first content collection **with** content.
+
+But what happens here?
+
+---
+
+# Creating Content: Step by Step
+
+
+
+
+
+``` r
+*create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "degree", title = "Education Level")
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+1 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education Level (bar) x=degree
+```
+
+`create_content()` sets up a container:
+
+- `data = gss`: the dataset to visualize
+
+- `type = "bar"`: default chart type for this collection
+
+---
+
+# Creating Content: Step by Step
+
+
+``` r
+create_content(data = gss, type = "bar") %&gt;%
+*  add_viz(x_var = "degree", title = "Education Level")
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+1 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education Level (bar) x=degree
+```
+
+`add_viz()` adds a visualization:
+
+- `x_var = "degree"`: which variable to plot
+
+- `title = "Education Level"`: chart title
+
+---
+
+# Inspecting Your Content
+
+Use `print()` to see what's inside your content collection or just run the content collection:
+
+
+``` r
+create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "degree", title = "Education Level") %&gt;% 
+  print()
+```
+
+```
+#&gt; -- Content Collection ──────────────────────────────────────────────────────────
+#&gt; 1 items | ✔ data: 2997 rows x 15 cols
+#&gt; 
+#&gt; • [Viz] Education Level (bar) x=degree
+```
+
+&lt;br&gt;
+
+This shows you exactly what you've built before generating anything!
+
+---
+
+# Previewing Your Content
+
+Use `preview()` to see the actual chart:
+
+
+
+
+``` r
+demographics %&gt;% preview()
+```
+
+
+
+
+
+&lt;iframe src="viz/0.html" width="100%" height="350px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+---
+
+
+### Limitations of Preview
+
+&gt; **Important:** `preview()` is a simplified rendering for quick checks during development. It does **not** show the final dashboard appearance.
+
+--
+
+&lt;br&gt;
+
+.pull-left[
+
+**What preview shows well:**
+
+- Individual visualizations and their data
+- Basic tabgroup organization
+- Content blocks (text, callouts, cards, etc.)
+- Simple nested tabs
+
+]
+
+.pull-right[
+**What preview does NOT support:**
+
+- Full dashboard navigation and layout
+- Interactive inputs (dropdowns, sliders, checkboxes)
+- Complex multi-page structures
+- Dashboard theming and styling
+- Sidebar navigation
+- Mobile responsiveness
+]
+
+
+
+&lt;br&gt;
+&lt;br&gt;
+
+**For a real view of your dashboard**, you must run `generate_dashboard()` and open the resulting Quarto site:
+
+---
+
+# Adding Multiple Visualizations
+
+You can keep adding to content collections:
+
+
+
+
+``` r
+demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
+*add_viz(x_var = degree, title = "Education Level") %&gt;%
+*add_viz(x_var = race, title = "By Race")
+```
+
+--
+
+
+``` r
+print(demographics)
+```
+
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education Level (bar) x=degree
+• [Viz] By Race (bar) x=race
+```
+
+
+&lt;br&gt;
+
+Now your collection has **two** bar charts underneath each other!
+
+---
+
+# Organizing with Tabgroups - using `tabgroup()`
+
+Use `tabgroup` to organize charts into **tabs**:
+
+
+
+
+
+``` r
+demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "degree", title = "Education", `tabgroup = "Demographics"`) %&gt;%
+  add_viz(x_var = "happy", title = "Happiness", `tabgroup = "Attitudes"`)
+```
+
+--
+
+
+``` r
+print(demographics)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+❯ [Tab] Demographics (1 viz)
+  • [Viz] Education (bar) x=degree
+❯ [Tab] Attitudes (1 viz)
+  • [Viz] Happiness (bar) x=happy
+```
+
+
+This creates:
+
+- Tab "Demographics" → Education chart
+- Tab "Attitudes" → Happiness chart
+
+---
+
+# Tabgroups: Step by Step - using `tabgroup()`
+
+
+
+``` r
+demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "degree", title = "Education", `tabgroup = "Demographics"`) %&gt;%
+  add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes")
+```
+
+
+
+``` r
+print(demographics)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+❯ [Tab] Demographics (1 viz)
+  • [Viz] Education (bar) x=degree
+❯ [Tab] Attitudes (1 viz)
+  • [Viz] Happiness (bar) x=happy
+```
+
+First visualization goes into the **"Demographics"** tab.
+
+---
+
+# Tabgroups: Step by Step - using `tabgroup()`
+
+
+
+``` r
+demographics &lt;- create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %&gt;%
+  add_viz(x_var = "happy", title = "Happiness", `tabgroup = "Attitudes"`)
+```
+
+
+``` r
+print(demographics)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+❯ [Tab] Demographics (1 viz)
+  • [Viz] Education (bar) x=degree
+❯ [Tab] Attitudes (1 viz)
+  • [Viz] Happiness (bar) x=happy
+```
+
+Second visualization goes into the **"Attitudes"** tab.
+
+---
+
+# Tabgroups: Preview
+
+
+
+``` r
+demographics %&gt;% preview()
+```
+
+&lt;iframe src="viz/1.html" width="100%" height="350px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+---
+
+# Different Chart Types
+
+You can also **override** arguments set by `create_content`. Change `type` in `create_content()` and override per visualization:
+
+.eighty[
+
+
+
+``` r
+mixed_charts &lt;- create_content(data = gss, `type = "bar"`) %&gt;%
+  add_viz(x_var = "degree", title = "Education") %&gt;%                 # bar (default)
+  add_viz(x_var = "age", title = "Age Distribution", `type = "histogram"`) %&gt;%  # override!
+  add_viz(x_var = "happy", title = "Happiness", `type = "bar"`)        # override back to bar!
+```
+]
+
+
+``` r
+print(mixed_charts)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+3 items | ✔ data: 3139 rows x 7 cols
+
+• [Viz] Education (bar) x=degree
+• [Viz] Age Distribution (histogram) x=age
+• [Viz] Happiness (bar) x=happy
+```
+
+--
+
+&lt;br&gt;
+
+Available types: `bar`, `histogram`, `stackedbar`, `timeline`, `heatmap`, `scatter`, `crosstab`, `treemap`, and MORE!
+
+---
+
+# Adding Text to Content - `add_text()`
+
+Content isn't just charts! Add text with `add_text()`:
+
+
+``` r
+intro_content &lt;- create_content() %&gt;%
+  add_text(
+    "## Welcome to the GSS Explorer",
+    "",
+    "This dashboard presents findings from the **General Social Survey**.",
+    "",
+    "Use the tabs above to explore different aspects of the data."
+  )
+```
+
+
+``` r
+print(intro_content)
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+1 items | ✖ no data
+
+ℹ [Text]
+```
+
+Each argument is a line of **Markdown**: use `""` for blank lines!
+
+---
+
+# Markdown Power in `add_text()`
+
+.pull-left[
+### What you write:
+
+```r
+add_text(
+
+  "## Section Title",
+  "Regular paragraph text.",
+*  "**Bold** and *italic* work!",
+*  "- Bullet points",
+*  "- Are supported",
+  "",
+*  "[Links](https://example.com) too!"
+)
+```
+]
+
+.pull-right[
+### What you get:
+
+## Section Title
+
+Regular paragraph text.
+
+**Bold** and *italic* work!
+
+- Bullet points
+- Are supported
+
+[Links](https://example.com) too!
+]
+
+--
+
+.center[
+.tip[
+No HTML knowledge needed: just write Markdown and `dashboardr` renders it beautifully!
+]
+]
+
+---
+
+
+# Adding Text to Content - `add_text()`
+
+Content isn't just charts! Add text with `add_text()`:
+
+
+
+``` r
+preview(intro_content)
+```
+
+&lt;iframe src="viz/3.html" width="100%" height="350px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+---
+
+# Mixing Text with Visualizations
+
+The real power: **combine text and charts** in one collection!
+
+
+
+
+``` r
+report &lt;- create_content(data = gss, type = "bar") %&gt;%
+*add_text(
+*  "## Survey Overview",
+*  "This section presents key demographic breakdowns from the GSS."
+*) %&gt;%
+  add_viz(x_var = "degree", title = "Education Level") %&gt;%
+*add_text(
+*  "**Note:** Education categories follow US Census definitions."
+*) %&gt;%
+  add_viz(x_var = "race", title = "Racial Demographics")
+```
+
+--
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+4 items | ✔ data: 3139 rows x 7 cols
+
+ℹ [Text]
+• [Viz] Education Level (bar) x=degree
+ℹ [Text]
+• [Viz] Racial Demographics (bar) x=race
+```
+
+Text and visualizations appear **in the order you add them**!
+
+---
+
+# Mixing Text with Visualizations: Preview
+
+
+``` r
+report %&gt;% preview()
+```
+
+&lt;iframe src="viz/4.html" width="100%" height="400px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+Text blocks render as **formatted Markdown** between your charts!
+
+---
+
+# Stacked Bars: Likert-Style Questions
+
+Perfect for **survey questions with ordered responses** (e.g., confidence, agreement):
+
+
+
+
+.eighty[
+
+``` r
+confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %&gt;%
+  add_viz(
+    x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic"),
+    x_var_labels = c("Banks &amp; financial institutions", "Major companies",
+                     "Education", "Federal government", "Medicine"),
+    title = "Confidence in Institutions",
+    stacked_type = "percent",
+    horizontal = TRUE
+  )
+```
+]
+
+---
+
+# Stacked Bars: Step by Step
+
+.eighty[
+
+``` r
+confidence &lt;- create_content(data = gss, `type = "stackedbars"`, `drop_na_vars = TRUE`) %&gt;%
+  add_viz(
+    x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic"),
+    x_var_labels = c("Banks &amp; financial institutions", "Major companies",
+                     "Education", "Federal government", "Medicine"),
+    title = "Confidence in Institutions",
+    stacked_type = "percent",
+    horizontal = TRUE
+  )
+```
+]
+
+- `type = "stackedbars"`: special type for **multiple variables** with same response scale
+- `drop_na_vars = TRUE`: removes NA values from the visualization
+
+---
+
+# Stacked Bars: Step by Step
+
+.eighty[
+
+``` r
+confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %&gt;%
+  add_viz(
+    `x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic")`,
+    `x_var_labels = c("Banks &amp; financial institutions", "Major companies",`,
+                     `"Education", "Federal government", "Medicine")`,
+    title = "Confidence in Institutions",
+    stacked_type = "percent",
+    horizontal = TRUE
+  )
+```
+]
+
+- `x_vars`: vector of **multiple variables** (not `x_var`!)
+- `x_var_labels`: human-readable labels for each variable
+
+---
+
+# Stacked Bars: Step by Step
+
+.eighty[
+
+``` r
+confidence &lt;- create_content(data = gss, type = "stackedbars", drop_na_vars = TRUE) %&gt;%
+  add_viz(
+    x_vars = c("confinan", "conbus", "coneduc", "confed", "conmedic"),
+    x_var_labels = c("Banks &amp; financial institutions", "Major companies",
+                     "Education", "Federal government", "Medicine"),
+    title = "Confidence in Institutions",
+    `stacked_type = "percent"`,
+    `horizontal = TRUE`
+  )
+```
+]
+
+- `stacked_type = "percent"`: shows percentages (vs `"count"` for raw numbers)
+- `horizontal = TRUE`: horizontal bars (easier to read labels)
+
+---
+
+# Stacked Bars: Preview
+
+
+``` r
+confidence %&gt;% preview()
+```
+
+&lt;iframe src="viz/6.html" width="100%" height="400px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:300px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+Great for comparing responses across multiple survey questions!
+
+---
+
+# Filtering Data with `filter`
+
+--
+
+Show the **same variable for different subgroups** side by side:
+
+
+``` r
+filtered &lt;- create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "happy", title = "Male", filter = ~ sex == "male", tabgroup = "Male") %&gt;%
+  add_viz(x_var = "happy", title = "Female", filter = ~ sex == "female", tabgroup = "Female")
+```
+
+```
+-- Content Collection ──────────────────────────────────────────────────────────
+2 items | ✔ data: 3139 rows x 7 cols
+
+❯ [Tab] Male (1 viz)
+  • [Viz] Male (bar) x=happy +filter
+❯ [Tab] Female (1 viz)
+  • [Viz] Female (bar) x=happy +filter
+```
+
+Notice the `+filter` indicator: filters are applied!
+
+---
+
+# Filtering: Step by Step
+
+
+``` r
+filtered &lt;- create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "happy", title = "Male", `filter = ~ sex == "male"`, tabgroup = "Male") %&gt;%
+  add_viz(x_var = "happy", title = "Female", filter = ~ sex == "female", tabgroup = "Female")
+```
+
+`filter = ~ sex == "male"` filters the data **before** creating the chart.
+
+- Uses **formula syntax** (starts with `~`)
+- Works like `dplyr::filter()` conditions
+- Only rows matching the condition are included
+
+---
+
+# Filtering: Step by Step
+
+
+``` r
+filtered &lt;- create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "happy", title = "Male", filter = ~ sex == "male", tabgroup = "Male") %&gt;%
+  add_viz(x_var = "happy", title = "Female", `filter = ~ sex == "female"`, tabgroup = "Female")
+```
+
+Second visualization filters to females only.
+
+Users can **switch between tabs** to compare happiness distributions!
+
+---
+
+# Filtering: Preview
+
+
+``` r
+filtered %&gt;% preview()
+```
+
+&lt;iframe src="viz/5.html" width="100%" height="350px" style="border:none;"
+  onload="this.contentDocument.head.insertAdjacentHTML('beforeend',
+    '&lt;style&gt;.highchart{height:250px !important}&lt;/style&gt;');
+    setTimeout(() =&gt; this.contentWindow.Highcharts?.charts.forEach(c =&gt; c?.reflow()), 500);"&gt;
+&lt;/iframe&gt;
+
+Each tab shows happiness levels for a different gender: easy comparison!
+
+---
+
+
+class: inverse, center, middle
+
+# Visualization Types
+## All 9 Chart Types
+
+![](https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif)
+
+---
+
+# Overview: Visualization Types
+
+| Function (under the hood) | `type = ""` | Best For |
+|---------------------------|-------------|----------|
+| `viz_histogram()` | `"histogram"` | Distributions |
+| `viz_bar()` | `"bar"` | Categories |
+| `viz_stackedbar()` | `"stackedbar"` | Composition |
+| `viz_stackedbars()` | `"stackedbars"` | Likert questions |
+| `viz_timeline()` | `"timeline"` | Time trends |
+| `viz_heatmap()` | `"heatmap"` | 2D patterns |
+| `viz_treemap()` | `"treemap"` | Hierarchies |
+| `viz_scatter()` | `"scatter"` | Relationships |
+| `viz_map()` | `"map"` | Geographic data |
+
+---
+
+# Common Parameters (All Chart Types)
+
+### Every visualization shares these core parameters:
+
+| Parameter | Purpose | Example |
+|-----------|---------|---------|
+| `title` | Chart title | `"Age Distribution"` |
+| `subtitle` | Secondary title | `"n = 500"` |
+| `tabgroup` | Tab organization | `"demographics"` |
+| `filter` | Subset data | `~ age &gt; 30` |
+| `color_palette` | Custom colors | `c("#3498DB", "#E74C3C")` |
+| `drop_na_vars` | Remove NA rows | `TRUE` |
+| `weight_var` | Survey weights | `"sample_weight"` |
+
+---
+
+# Key Variables by Chart Type
+
+| Chart Type | Primary Vars | Optional Vars |
+|------------|--------------|---------------|
+| `histogram` | `x_var` | `bins`, `bin_breaks` |
+| `bar` | `x_var` | `group_var`, `horizontal` |
+| `stackedbar` | `x_var`, `stack_var` | `stack_breaks` |
+| `timeline` | `time_var`, `y_var` | `group_var`, `y_filter` |
+| `heatmap` | `x_var`, `y_var`, `value_var` | `agg_fun` |
+| `treemap` | `group_var`, `value_var` | `color_var` |
+| `scatter` | `x_var`, `y_var` | `color_var`, `size_var` |
+| `map` | `location_var`, `value_var` | `map_type` |
+
+.tip[
+Each chart type has specific required variables. Check the documentation! [Click Here](https://favstats.github.io/dashboardr/articles/content-collections.html#visualization-types) for content collection deep dive.
+
+]
+
+
+---
+
+# Content Layer Summary
+
+| Function | Purpose |
+|----------|---------|
+| `create_content(data, type)` | Start a new content collection |
+| `add_viz(x_var, title, ...)` | Add a visualization |
+| `add_text(...)` | Add markdown text |
+| `print()` | Inspect structure |
+| `preview()` | Quick visual check |
+
+
+**Key insight:** 
+
+Content is *reusable*: you can attach the same content to multiple pages!
+
+---
+
+
+# The Typical Pattern
+
+Most dashboardr code follows this pattern:
+
+
+``` r
+# 1. CREATE a container
+create_content(data = my_data, type = "bar") %&gt;%
+  # 2. ADD elements to it
+  add_viz(x_var = "category", title = "My Chart") %&gt;%
+  add_text("## Summary", "Key findings here.")
+```
+
+--
+
+&lt;br&gt;
+
+This works at **every layer**:
+
+- **Content**: `create_content() %&gt;% add_viz() %&gt;% add_text()`
+- **Page**: `create_page() %&gt;% add_content() %&gt;% add_viz()`
+- **Dashboard**: `create_dashboard() %&gt;% add_pages() %&gt;% generate_dashboard()`
+
+---
+
+
+class: center, middle
+
+## Layer 1 Complete! 🎉
+
+You now know how to build **content collections** with visualizations!
+
+![](https://media.giphy.com/media/5aWC7vyZtQIoLemw1R/giphy.gif)
+
+---
+
+class: inverse, center, middle
+
+# Exercise 1
+## Build Your First Content Collection
+
+![](https://media1.tenor.com/images/72bf7922ac0b07b2f7f8f630e4ae01d2/tenor.gif?itemid=11364811)
+
+---
+
+# Exercise 1: Your Task
+
+Create a content collection with the GSS data:
+
+.pull-left[
+
+**Step 1:** Create content with bar charts for `degree` and `race`
+
+- `create_content()` and `add_viz()`
+
+**Step 2:** Organize them into tabgroups
+
+- `tabgroup = "XXX"`
+
+**Step 3:** Add some text with `add_text()`
+
+**Step 4:** Use `print()` and `preview()` to check your work!
+
+]
+
+.pull-right[
+
+
+You can always consult the documentation as well: 
+
+[Click Here](https://favstats.github.io/dashboardr/articles/content-collections.html) for content collection deep dive.
+
+]
+
+
+&gt; **ALTERNATIVELY:** user your own data in a similar way!
+
+
+⏱️ **Time:** ~30 minutes
+
+---
+
+class: inverse, center, middle
+
+# Layer 2: Pages
+## Organizing Your Content
+
+![](https://media.giphy.com/media/l0HlRnAWXxn0MhKLK/giphy.gif)
+
+---
+
+# What are Pages?
+
+**Pages** organize content and define your dashboard's **navigation**.
+
+Each page becomes a **separate HTML file** in your final dashboard.
+
+--
+
+.pull-left[
+### Think of pages as:
+
+- 📄 Individual screens in your dashboard
+- 🧭 Navigation menu items
+- 📦 Containers for content collections
+]
+
+.pull-right[
+### Examples:
+
+- **Home**: Welcome/landing page
+- **Analysis**: Charts and data
+- **About**: Project information
+]
+
+---
+
+# Creating a Page: Overview
+
+Let's create a simple landing page. It should be very familiar to you at this point:
+
+
+``` r
+home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+  add_text(
+    "# Welcome!",
+    "",
+    "Explore the GSS data using the navigation above."
+  )
+```
+
+This creates a page named "Home" that will be the **default** page visitors see.
+
+---
+
+# Creating a Page: Step by Step
+
+
+``` r
+*home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+  add_text(
+    "# Welcome!",
+    "",
+    "Explore the GSS data using the navigation above."
+  )
+```
+
+`create_page()` starts a new page:
+
+- `"Home"`: the page name (appears in navigation)
+- `is_landing_page = TRUE`: makes this the default page
+
+---
+
+# Creating a Page: Step by Step
+
+
+``` r
+home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+*  add_text(
+*    "# Welcome!",
+*    "",
+*    "Explore the GSS data using the navigation above."
+*  )
+```
+
+`add_text()` adds markdown content directly to the page.
+
+Each argument is a line: `""` creates a blank line.
+
+---
+
+# Connecting Content to Pages
+
+Remember your content collection? Connect it to a page with `add_content()`:
+
+
+``` r
+analysis &lt;- create_page("Analysis", data = gss) %&gt;%
+  add_text("## GSS Results") %&gt;%
+  add_content(demographics)
+```
+
+--
+
+&lt;br&gt;
+
+The `add_content()` function **connects layers**:
+
+- Takes the content collection you built earlier
+- Attaches it to this page
+
+---
+
+# Connecting Content: Step by Step
+
+
+``` r
+*analysis &lt;- create_page("Analysis", data = gss) %&gt;%
+  add_text("## GSS Results") %&gt;%
+  add_content(demographics)
+```
+
+Create a page named "Analysis" with a dataset attached.
+
+The `data` argument provides the dataset for visualizations.
+
+---
+
+# Connecting Content: Step by Step
+
+
+``` r
+analysis &lt;- create_page("Analysis", data = gss) %&gt;%
+*  add_text("## GSS Results") %&gt;%
+  add_content(demographics)
+```
+
+Add a header to the page using markdown.
+
+---
+
+# Connecting Content: Step by Step
+
+
+``` r
+analysis &lt;- create_page("Analysis", data = gss) %&gt;%
+  add_text("## GSS Results") %&gt;%
+*  add_content(demographics)
+```
+
+Connect your content collection (`demographics`) to this page!
+
+All the visualizations you created will appear here.
+
+---
+
+# Adding Viz Directly to Pages
+
+You can also add visualizations directly to pages (without a separate content collection):
+
+
+``` r
+quick_page &lt;- create_page("Quick View", data = gss, type = "bar") %&gt;%
+  add_text("## Quick Analysis") %&gt;%
+  add_viz(x_var = "happy", title = "Happiness Levels")
+```
+
+--
+
+&lt;br&gt;
+
+This is handy for simple pages with just one or two charts!
+
+---
+
+
+
+### 🆚 create_page() vs create_content()
+
+Pages can hold all the same content as `create_content()` (visualizations, text, callouts, etc.), but they also carry **page-level metadata** like the page name, icon, and navbar position.
+
+| | `create_content()` | `create_page()` |
+|---|---|---|
+| **Purpose** | Build reusable content blocks | Create a dashboard page |
+| **Page metadata** | No | Yes (icons, navbar position, overlays) |
+| **Data defaults** | Yes | Yes |
+| **Use with `create_dashboard()`** | Must be added to a page first | Can be added directly |
+
+**Think of it this way:**
+
+- `create_content()` = building blocks (reusable pieces, can be used on any page)
+- `create_page()` = the destination (what users navigate to)
+
+---
+
+## 🔀 Two Workflows
+
+### Workflow 1: Simple Dashboards (Direct)
+
+For straightforward dashboards, add content directly to pages:
+
+
+``` r
+# Everything in one chain
+simple_page &lt;- create_page("Analysis", data = gss, type = "bar") %&gt;%
+  add_text("## Education Distribution", "", "How education levels are distributed.") %&gt;%
+  add_viz(x_var = "degree", title = "Education Levels") %&gt;%
+  add_callout("Data from GSS 2022", type = "note")
+```
+
+
+**When to use:** Quick dashboards, single-topic pages, prototyping.
+
+---
+
+### Workflow 2: Complex Dashboards (Modular)
+
+For complex dashboards, build content separately, then assemble with `add_content()`:
+
+
+``` r
+# Step 1: Build content pieces separately
+intro_text &lt;- create_content() %&gt;%
+  add_text("## Overview", "", "Key findings from the General Social Survey.")
+
+demographic_charts &lt;- create_content(type = "bar") %&gt;%
+  add_viz(x_var = "degree", title = "Education", tabgroup = "Demographics") %&gt;%
+  add_viz(x_var = "race", title = "Race", tabgroup = "Demographics")
+
+attitude_charts &lt;- create_content(type = "bar") %&gt;%
+  add_viz(x_var = "happy", title = "Happiness", tabgroup = "Attitudes") %&gt;%
+  add_viz(x_var = "polviews", title = "Political Views", tabgroup = "Attitudes")
+
+# Step 2: Assemble into page
+complex_page &lt;- create_page("Full Analysis", data = gss) %&gt;%
+  add_content(intro_text) %&gt;%
+  add_content(demographic_charts) %&gt;%
+  add_content(attitude_charts)
+```
+
+---
+
+## **When to use:** Multi-section pages, reusable content, complex layouts.
+
+**Why this approach?**
+
+1. **Modularity** - Each content piece is self-contained and testable
+2. **Reusability** - Share content across multiple pages
+
+**Rule of thumb:**
+
+- Same viz type, same styling → build directly on `create_page()`
+- Different viz types, different defaults → use `create_content()` first
+3. **Clarity** - Easier to understand page structure
+4. **Maintainability** - Update one section without touching others
+
+---
+
+# Page Options
+
+Pages have several useful options:
+
+.eighty[
+
+``` r
+about &lt;- create_page(
+  "About",
+  navbar_align = "right",    # Position in navigation (left/right)
+  icon = "ph:info"           # Add an icon!
+) %&gt;%
+  add_text(
+    "## About This Dashboard",
+    "",
+    "Built with [dashboardr](https://github.com/favstats/dashboardr)"
+  )
+```
+]
+
+--
+
+&lt;br&gt;
+
+Icons use the [Iconify](https://icon-sets.iconify.design/) format: `"ph:info"`, `"ph:chart-bar"`, etc.
+
+---
+
+# Previewing Pages
+
+Just like content, you can preview pages:
+
+
+``` r
+analysis %&gt;% preview()
+```
+
+This shows how the page will look (approximately) in your final dashboard.
+
+---
+
+# Pages Layer Summary
+
+.eightyfive[
+| Function | Purpose |
+|----------|---------|
+| `create_page(name, ...)` | Start a new page |
+| `add_content(content)` | Attach a content collection |
+| `add_text(...)` | Add markdown text |
+| `add_viz(...)` | Add visualization directly |
+| `is_landing_page = TRUE` | Make this the default page |
+| `navbar_align = "right"` | Position in navigation |
+| `icon = "ph:..."` | Add an icon |
+]
+
+---
+
+class: center, middle
+
+## Layer 2 Complete! 🎉
+
+You now know how to create **pages** and connect content!
+
+![](https://media.giphy.com/media/XGJY5KLuazndauTfZP/giphy.gif)
+
+---
+
+class: inverse, center, middle
+
+# Exercise 2
+## Create Your Pages
+
+![](https://media1.tenor.com/images/72bf7922ac0b07b2f7f8f630e4ae01d2/tenor.gif?itemid=11364811)
+
+---
+
+# Exercise 2: Your Task
+
+Create pages for your dashboard:
+
+**Step 1:** Create a landing page with welcome text
+
+
+``` r
+home &lt;- create_page("Home", is_landing_page = TRUE) %&gt;%
+  add_text("# ___", "", "___")
+```
+
+**Step 2:** Create an analysis page using your content
+
+
+``` r
+analysis &lt;- create_page("Analysis", data = gss) %&gt;%
+  add_content(___)
+```
+
+**Step 3:** Create an "About" page (right-aligned in navbar)
+
+**Step 4:** Preview each page!
+
+&lt;br&gt;
+
+[Click Here](https://favstats.github.io/dashboardr/articles/pages.html) for pages deep dive.
+
+
+⏱️ **Time:** ~15 minutes
+
+---
+
+class: inverse, center, middle
+
+# Layer 3: Dashboard
+## Bringing It All Together
+
+![](https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif)
+
+---
+
+# What is a Dashboard?
+
+The **dashboard** is the final layer that brings pages together.
+
+### It handles:
+
+
+- ⚙️ **Configuration**: search bars,social links etc.
+
+- 🧭 **Navigation**: how pages are organized
+
+- 📁 **Output**: where files are generated
+
+- 🎨 **Theming**: colors, fonts, overall look
+
+
+---
+
+# Creating a Dashboard: Overview
+
+
+``` r
+my_dashboard &lt;- create_dashboard(
+  title = "GSS Explorer",
+  output_dir = "my_dashboard",
+  publish_dir = "../docs",
+  theme = "cosmo"
+) %&gt;%
+  add_pages(home, analysis, about)
+```
+
+This creates a dashboard with:
+
+- A title for the browser tab
+- Output directory for source files
+- Publish directory for rendered HTML
+- A visual theme
+- Your pages in the navigation
+
+---
+
+# Creating a Dashboard: Step by Step
+
+
+``` r
+my_dashboard &lt;- create_dashboard(
+*  title = "GSS Explorer",
+  output_dir = "my_dashboard",
+  publish_dir = "../docs",
+  theme = "cosmo"
+) %&gt;%
+  add_pages(home, analysis, about)
+```
+
+`title`: appears in the browser tab and header.
+
+---
+
+# Creating a Dashboard: Step by Step
+
+
+``` r
+my_dashboard &lt;- create_dashboard(
+  title = "GSS Explorer",
+*  output_dir = "my_dashboard",
+  publish_dir = "../docs",
+  theme = "cosmo"
+) %&gt;%
+  add_pages(home, analysis, about)
+```
+
+`output_dir`: folder where **source files** (.qmd) will be created.
+
+---
+
+# Creating a Dashboard: Step by Step
+
+
+``` r
+my_dashboard &lt;- create_dashboard(
+  title = "GSS Explorer",
+  output_dir = "my_dashboard",
+*  publish_dir = "../docs",
+  theme = "cosmo"
+) %&gt;%
+  add_pages(home, analysis, about)
+```
+
+`publish_dir`: folder where **rendered HTML** files end up.
+
+- The `../` moves **up one level** from `output_dir`
+- Typical for GitHub Pages: HTML lands in `docs/` at project root
+
+---
+
+
+# Understanding `output_dir` and `publish_dir`
+
+.pull-left[
+### `output_dir`
+Where your **source files** (.qmd) are created
+
+
+``` r
+create_dashboard(
+  output_dir = "my_dashboard",
+  ...
+)
+```
+
+Creates: `my_dashboard/_quarto.yml`, `my_dashboard/index.qmd`, etc.
+]
+
+.pull-right[
+### `publish_dir`
+Where your **rendered HTML** files end up
+
+
+``` r
+create_dashboard(
+  output_dir = "my_dashboard",
+  `publish_dir = "../docs"`,
+  ...
+)
+```
+
+The `../` moves **up one level** from `output_dir`!
+]
+
+--
+
+&lt;br&gt;
+
+.center[
+**Typical setup for GitHub Pages:**
+
+`output_dir = "dashboard"` + `publish_dir = "../docs"` → HTML in `docs/` folder (project root)
+]
+
+---
+
+
+# Creating a Dashboard: Step by Step
+
+
+``` r
+my_dashboard &lt;- create_dashboard(
+  title = "GSS Explorer",
+  output_dir = "my_dashboard",
+  publish_dir = "../docs",
+*  theme = "cosmo"
+) %&gt;%
+  add_pages(home, analysis, about)
+```
+
+`theme`: visual theme for your dashboard.
+
+Options: `"cosmo"`, `"flatly"`, `"journal"`, `"lux"`, `"minty"`, `"pulse"`, `"sandstone"`, `"simplex"`, `"sketchy"`, `"slate"`, `"solar"`, `"spacelab"`, `"superhero"`, `"united"`, `"yeti"`, and more!
+
+---
+
+# Creating a Dashboard: Step by Step
+
+
+``` r
+my_dashboard &lt;- create_dashboard(
+  title = "GSS Explorer",
+  output_dir = "my_dashboard",
+  publish_dir = "../docs",
+  theme = "cosmo"
+) %&gt;%
+*  add_pages(home, analysis, about)
+```
+
+`add_pages()`: adds your pages to the dashboard.
+
+Pages appear in the navbar **in the order you add them**.
+
+---
+
+# Inspecting Your Dashboard
+
+Use `print()` to see the full structure:
+
+
+``` r
+print(my_dashboard)
+```
+
+```
+── Dashboard: GSS Explorer ──────────────────────────
+Theme: cosmo
+Output: my_dashboard/
+
+Pages (3):
+ • Home (landing page)
+ • Analysis
+ • About (right-aligned)
+```
+
+---
+
+# Generating Your Dashboard
+
+When you're ready, generate the final HTML:
+
+
+``` r
+my_dashboard %&gt;%
+  generate_dashboard(render = TRUE, open = "browser")
+```
+
+--
+
+&lt;br&gt;
+
+This:
+
+1. Creates Quarto (.qmd) files
+2. Renders them to HTML
+3. Opens the result in your browser!
+
+---
+
+# Generate Options
+
+
+``` r
+my_dashboard %&gt;%
+*  generate_dashboard(render = TRUE, open = "browser")
+```
+
+- `render = TRUE`: actually build the HTML (set `FALSE` to just create .qmd files)
+- `open = "browser"`: open in browser when done (or `"viewer"` for RStudio viewer, or `FALSE`)
+
+---
+
+# Preview Before Generating
+
+You can also preview the dashboard without generating everything:
+
+
+``` r
+my_dashboard %&gt;% preview()
+```
+
+--
+
+&lt;br&gt;
+
+This is faster for quick checks while you're building!
+
+---
+
+# Dashboard Options
+
+More configuration options:
+
+.eighty[
+
+``` r
+my_dashboard &lt;- create_dashboard(
+  title = "GSS Explorer",
+  output_dir = "my_dashboard",
+  publish_dir = "../docs",
+  theme = "flatly",
+  search = TRUE,              # Add search functionality
+  repo_url = "https://github.com/you/repo",  # Link to source
+  footer = "Built with dashboardr"
+)
+```
+]
+
+---
+
+# Dashboard Layer Summary
+
+.ninety[
+| Function | Purpose |
+|----------|---------|
+| `create_dashboard(title, ...)` | Start a new dashboard |
+| `add_pages(...)` | Add pages to navigation |
+| `generate_dashboard(...)` | Build the final HTML |
+| `preview()` | Quick preview |
+| `theme = "..."` | Visual theme |
+| `search = TRUE` | Enable search |
+]
+
+---
+
+class: center, middle
+
+## Layer 3 Complete! 🎉
+
+You now know the **entire dashboardr workflow**!
+
+Content → Pages → Dashboard → Generate!
+
+![](https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif)
+
+---
+
+class: inverse, center, middle
+
+# Exercise 3
+## Build Your Complete Dashboard
+
+![](https://media1.tenor.com/images/72bf7922ac0b07b2f7f8f630e4ae01d2/tenor.gif?itemid=11364811)
+
+---
+
+# Exercise 3: Your Task
+
+Bring everything together!
+
+**Step 1:** Create your dashboard
+
+
+``` r
+my_dashboard &lt;- create_dashboard(
+  title = "___",
+  output_dir = "___",
+  publish_dir = "../docs",
+  theme = "___"
+) %&gt;%
+  add_pages(___, ___, ___)
+```
+
+**Step 2:** Generate your dashboard!
+
+
+``` r
+my_dashboard %&gt;% 
+  generate_dashboard(render = TRUE, open = "browser")
+```
+
+[Click Here](https://favstats.github.io/dashboardr/articles/dashboards.html) for dashboard deep dive.
+
+
+⏱️ **Time:** ~20 minutes
+
+---
+
+class: inverse, center, middle
+
+# Publishing Your Dashboard
+
+### Share it with the world! 🌐
+
+![](https://media.giphy.com/media/l0MYGb1LuZ3n7dRnO/giphy.gif)
+
+---
+
+# Publishing to GitHub Pages
+
+.pull-left[
+### Two Simple Commands
+
+**First time (publish):**
+
+
+``` r
+publish_dashboard()
+```
+
+**Updates:**
+
+
+``` r
+update_dashboard(message = "Added new charts")
+```
+
+Your URL: `https://USERNAME.github.io/dashboard-name/`
+]
+
+.pull-right[
+### What You Need
+
+1. Git installed
+2. GitHub account
+3. Personal Access Token (one-time setup)
+
+### What Happens
+
+- Git repo created automatically
+- Data files excluded (`.gitignore`)
+- GitHub Pages configured
+- Live in 2-5 minutes!
+]
+
+--
+
+.center[
+📖 **Full tutorial:** [favstats.github.io/dashboardr/articles/publishing_dashboards](https://favstats.github.io/dashboardr/articles/publishing_dashboards.html)
+]
+
+---
+
+class: center, middle, inverse
+
+## Part 4: Theming &amp; Styling
+
+### Make your dashboard beautiful!
+
+![](https://media.giphy.com/media/l46CyJmS9KUbokzsI/giphy.gif)
+
+---
+
+## Two Levels of Theming
+
+.pull-left[
+### 1. Bootswatch Themes
+Overall look and feel
+
+
+``` r
+create_dashboard(
+  ...,
+* theme = "flatly"
+)
+```
+
+Options: `cosmo`, `flatly`, `journal`, `darkly`, `minty`, `yeti`, `united`, `slate`, `cyborg`, `vapor`, and more!
+
+Browse: https://bootswatch.com/
+]
+
+.pull-right[
+### 2. Tabset Themes
+Tab styling
+
+
+``` r
+create_dashboard(
+  ...,
+* tabset_theme = "modern"
+)
+```
+
+Options:
+- `modern` - Clean with shadows
+- `minimal` - Simple (default)
+- `pills` - Rounded buttons
+- `classic` - Traditional tabs
+- `underline` - Bottom border
+- `segmented` - iOS-style
+]
+
+---
+
+## Built-in Theme Functions
+
+
+``` r
+dashboard %&gt;%
+* apply_theme(theme_modern())
+```
+
+| Function | Style |
+|----------|-------|
+| `theme_modern()` | Tech/startup feel |
+| `theme_academic()` | Research/scholarly |
+| `theme_clean()` | Minimal, professional |
+| `theme_ascor()` | UvA ASCoR branding |
+
+--
+
+### With Color Variants
+
+
+``` r
+apply_theme(theme_modern("purple"))  # Purple accent
+apply_theme(theme_modern("green"))   # Green accent
+apply_theme(theme_academic(accent_color = "#8B0000"))  # Custom
+```
+
+---
+
+## Deep Customization
+
+
+``` r
+dashboard %&gt;%
+  apply_theme(
+    theme_modern("purple"),
+    
+    # Typography
+*   mainfont = "Inter",
+*   fontsize = "18px",
+*   fontcolor = "#1f2937",
+*   linkcolor = "#2563eb",
+    
+    # Code styling
+*   monofont = "Fira Code",
+*   monobackgroundcolor = "#f8fafc",
+    
+    # Layout
+*   navbar_bg_color = "#1e40af",
+*   navbar_text_color = "#ffffff",
+*   max_width = "1400px",
+    
+    # Spacing
+    margin_left = "2rem",
+    margin_right = "2rem"
+  )
+```
+
+---
+
+## Custom Tab Colors
+
+
+``` r
+create_dashboard(
+  ...,
+  tabset_theme = "modern",
+* tabset_colors = list(
+*   active_bg = "#3498DB",
+*   active_text = "#FFFFFF",
+*   inactive_bg = "#ECF0F1",
+*   inactive_text = "#7F8C8D",
+*   hover_bg = "#BDC3C7"
+* )
+)
+```
+
+--
+
+.tip-box[
+Match your tabset colors to your organization's brand colors for a cohesive look!
+]
+
+---
+
+## Icons Everywhere!
+
+### Format: `"set:icon-name"`
+
+.pull-left[
+**Phosphor (`ph:`)** - Recommended!
+- `ph:house-fill` - Home
+- `ph:chart-bar-fill` - Bar chart
+- `ph:users-fill` - Users
+- `ph:heart-fill` - Heart
+- `ph:gear-fill` - Settings
+- `ph:sparkle-fill` - Sparkle
+]
+
+.pull-right[
+**Bootstrap (`bi:`)**
+- `bi:graph-up` - Graph
+- `bi:people-fill` - People
+
+**Font Awesome (`fa:`)**
+- `fa:chart-bar` - Chart
+- `fa:users` - Users
+]
+
+--
+
+### Browse 200,000+ icons: https://icon-sets.iconify.design/
+
+---
+
+## Using Icons
+
+
+``` r
+# In pages
+add_page("Home", icon = "ph:house-fill")
+
+# In text
+md_text("## Features {{&lt; iconify ph:sparkle-fill &gt;}}")
+
+# In tab labels
+set_tabgroup_labels(list(
+* demographics = "{{&lt; iconify ph:users-fill &gt;}} Demographics",
+* feedback = "{{&lt; iconify ph:heart-fill &gt;}} Feedback"
+))
+```
+
+
+---
+
+class: inverse, center, middle
+
+# Function Overview
+## Quick Reference
+
+![](https://media.giphy.com/media/WoWm8YzFQJg5i/giphy.gif)
+
+---
+
+# Function Naming Conventions
+
+dashboardr uses **consistent naming** so you always know what a function does:
+
+.eighty[
+| Prefix | Purpose | Examples |
+|--------|---------|----------|
+| `create_*` | Create containers | `create_dashboard()`, `create_page()`, `create_content()` |
+| `add_*` | Add to containers | `add_viz()`, `add_text()`, `add_pages()`, `add_content()` |
+| `viz_*` | Build single charts | `viz_bar()`, `viz_histogram()`, `viz_timeline()` |
+| `set_*` | Modify properties | `set_tabgroup_labels()` |
+| `generate_*` | Produce output | `generate_dashboard()` |
+| `theme_*` | Apply styling | `theme_modern()`, `theme_clean()` |
+| `combine_*` | Merge collections | `combine_content()`, `combine_viz()` |
+| `preview()` | Quick look | Works on content, pages, or dashboards |
+]
+
+---
+
+# Tips for Success
+
+.pull-left[
+### Development workflow
+
+1. **Print often**: inspect structure before generating
+
+2. **Preview as you go**: see results without building everything
+
+3. **Start simple**: build one piece at a time, then combine
+]
+
+.pull-right[
+### Organization
+
+4. **Use tabgroups**: they make complex dashboards navigable
+
+5. **Build content separately**: create reusable collections, attach to multiple pages
+]
+
+---
+
+class: inverse, center, middle
+
+# Questions?
+
+## Time for free practice!
+
+![](https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif)
+
+---
+
+# Free Practice: Worksheet
+
+Work through the **dashboardr worksheet** at your own pace!
+
+📄 **Download:** [github.com/favstats/dashboardr/blob/main/dev/dashboardr_worksheet.Rmd](https://github.com/favstats/dashboardr/blob/main/dev/dashboardr_worksheet.Rmd)
+
+--
+
+.pull-left[
+### Exercises 1-4: Basics
+1. Create a bar chart for `race`
+2. Add education chart, save as `first_collection`
+3. Create a home page with text
+4. Create an analysis page with your content
+]
+
+.pull-right[
+### Exercises 5-8: Building Up
+5. Create page with 3 charts (bar, histogram, scatter)
+6. Write collection to its own page
+7. Combine pages into a dashboard
+8. Generate with `render = TRUE`
+]
+
+---
+
+# Free Practice: Advanced Challenge
+
+### Exercise 9: Stacked Bars with Breakdowns
+
+Break down `polviews` by **age**, **gender**, and **race**: like in the [AI Opinion Monitor](https://algorithmicsociety.github.io/ai-opinion-monitor/)!
+
+.seventy[
+
+``` r
+political_views_collection &lt;- create_content(data = gss, type = "bar") %&gt;%
+  add_viz(x_var = "polviews", title = "Overall Views", tabgroup = "Political Views") %&gt;% 
+  add_viz(tabgroup = "By Gender", type = "stackedbar",
+          data = gss_clean,
+          x_var = "sex", stack_var = "polviews",
+          title = "Political Views by Gender",
+          stacked_type = "percent") %&gt;%
+  add_viz(tabgroup = "By Age", type = "stackedbar",
+          data = gss_clean,
+          x_var = "age_num", stack_var = "polviews",
+          x_breaks = age_breaks, x_bin_labels = age_labels,
+          stacked_type = "percent")
+  # YOUR TURN: Add "By Race" tab!
+```
+]
+
+Check the [stackedbars vignette](https://favstats.github.io/dashboardr/articles/stackedbars_vignette.html) for help!
+
+---
+
+![](images/meme.png)
+
+---
+
+# Resources
+
+- **Package website**: [favstats.github.io/dashboardr](https://favstats.github.io/dashboardr/)
+
+- **Getting started**: [Getting Started Vignette](https://favstats.github.io/dashboardr/articles/getting-started.html)
+
+- **All vignettes**:
+  - [Content Collections](https://favstats.github.io/dashboardr/articles/content-collections.html): visualization types, tabgroups
+  - [Pages](https://favstats.github.io/dashboardr/articles/pages.html): page options, icons
+  - [Dashboards](https://favstats.github.io/dashboardr/articles/dashboards.html): themes, navigation
+  - [Advanced Features](https://favstats.github.io/dashboardr/articles/advanced-features.html): tips &amp; debugging
+  - [Publishing](https://favstats.github.io/dashboardr/articles/publishing_dashboards.html): GitHub Pages deployment
+
+- **Source code**: [github.com/favstats/dashboardr](https://github.com/favstats/dashboardr)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "highlightSpans": true,
+  "countIncrementalSlides": false,
+  "slideNumberFormat": "%current%<br>",
+  "ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
