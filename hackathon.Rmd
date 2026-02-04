@@ -3,7 +3,7 @@ title: "dashboardr hackathon"
 subtitle: "Building Beautiful Interactive Dashboards in R"
 author: '<br><br><br><br>
 Fabio Votta <br>
-Alexndra Pafford <br>
+Alexandra Pafford <br>
 Max Paulus <br>
 Ernesto de Léon <br>
 </a> <br>
@@ -415,6 +415,10 @@ AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
 .center[
 **GOT SOME FUNDING YAY!** 🎉
+
+<img src="https://digicomlab.github.io/img/digicom_logo.png">
+
+
 ]
 
 
@@ -513,7 +517,7 @@ AlgoSoc Longitudinal Survey and the need to share data in easily accessible ways
 
 .center[
 .key-point[
-**The ambitious goal:** A *grammar of dashboards*... like ggplot2 for plots!
+**The ambitious goal:** A *grammar of dashboards*... like a ggplot2 for dashboards!
 ]
 ]
 
